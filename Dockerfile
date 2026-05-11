@@ -6,15 +6,17 @@ ENV PATH="$PNPM_HOME:$PATH"
 
 FROM base AS deps
 WORKDIR /app
+ENV HUSKY=0
 COPY package.json pnpm-lock.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    HUSKY=0 pnpm install --frozen-lockfile --prod
+    pnpm install --frozen-lockfile --prod
 
 FROM base AS builder
 WORKDIR /app
+ENV HUSKY=0
 COPY package.json pnpm-lock.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    HUSKY=0 pnpm install --frozen-lockfile
+    pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm run build
 
