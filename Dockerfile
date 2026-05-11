@@ -8,13 +8,13 @@ FROM base AS deps
 WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm install --frozen-lockfile --prod
+    HUSKY=0 pnpm install --frozen-lockfile --prod
 
 FROM base AS builder
 WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm install --frozen-lockfile
+    HUSKY=0 pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm run build
 
