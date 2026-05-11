@@ -90,7 +90,7 @@
   },
   "engines": {
     "node": ">=22",
-    "pnpm": ">=9"
+    "pnpm": ">=10.8.1"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
@@ -99,5 +99,6 @@
       "protobufjs",
       "ssh2"
     ]
-  }
+  },
+  "packageManager": "pnpm@10.8.1"
 }
