@@ -1,4 +1,4 @@
-import { Password } from '../value-objects/password.vo';
+import { Password } from "../value-objects/password.vo";
 
 export class User {
   constructor(
@@ -6,7 +6,7 @@ export class User {
     public name: string,
     public email: string,
     public readonly password: Password,
-    private readonly createdAt: Date = new Date(),
+    private readonly createdAt: Date = new Date()
   ) {}
 
   getId(): string {
@@ -27,16 +27,16 @@ export class User {
 
   updateName(newName: string): void {
     if (!newName || newName.trim().length === 0) {
-      throw new Error('Name cannot be empty');
+      throw new Error("Name cannot be empty");
     }
 
     this.name = newName;
   }
 
   static create(id: string, name: string, email: string): User {
-    if (!email.includes('@')) {
-      throw new Error('Invalid email');
+    if (!email.includes("@")) {
+      throw new Error("Invalid email");
     }
-    return new User(id, name, email, Password.create('defaultPassword'));
+    return new User(id, name, email, Password.create("defaultPassword"));
   }
 }
