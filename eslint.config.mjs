@@ -1,40 +1,40 @@
 // @ts-check
-import eslint from '@eslint/js';
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
-import globals from 'globals';
-import tseslint from 'typescript-eslint';
 
-export default tseslint.config(
+import js from "@eslint/js";
+import { defineConfig, globalIgnores } from "eslint/config";
+import tseslint from "typescript-eslint";
+
+export default defineConfig([
+  globalIgnores(["node_modules/*", "dist/*"]),
+
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+
   {
-    ignores: [
-      'eslint.config.mjs',
-      'commitlint.config.js',
-      'jest.config.js',
-      'dist/**',
-    ],
-  },
-  eslint.configs.recommended,
-  ...tseslint.configs.recommendedTypeChecked,
-  eslintPluginPrettierRecommended,
-  {
+    name: "infra/typescript-typed-rules",
+    files: ["**/*.ts", "**/*.mts", "**/*.cts"],
     languageOptions: {
-      globals: {
-        ...globals.node,
-        ...globals.jest,
-      },
-      sourceType: 'commonjs',
       parserOptions: {
-        projectService: true,
+        project: "./tsconfig.json",
         tsconfigRootDir: import.meta.dirname,
       },
     },
-  },
-  {
     rules: {
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-floating-promises': 'warn',
-      '@typescript-eslint/no-unsafe-argument': 'warn',
-      'prettier/prettier': ['error', { endOfLine: 'auto' }],
+      "@typescript-eslint/no-floating-promises": "error",
+      "@typescript-eslint/await-thenable": "error",
+      "@typescript-eslint/no-explicit-any": "error",
+      "prefer-const": "error",
+      "no-console": ["warn", { allow: ["warn", "error"] }],
+      "@typescript-eslint/consistent-type-definitions": ["error", "interface"],
+      "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+      "@typescript-eslint/explicit-function-return-type": "warn",
     },
   },
-);
+  {
+    name: "infra/general-rules",
+    rules: {
+      semi: ["error", "always"],
+      "no-console": ["warn", { allow: ["warn", "error"] }],
+    },
+  },
+]);

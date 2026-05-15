@@ -1,6 +1,9 @@
 {
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
   "[yaml]": {
     "editor.defaultFormatter": "redhat.vscode-yaml"
   }
