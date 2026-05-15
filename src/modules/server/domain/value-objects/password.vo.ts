@@ -10,7 +10,7 @@ export class Password {
   // Crear desde texto plano (la hashea)
   static create(plainText: string): Password {
     if (plainText.length < 8) {
-      throw new Error('Password must be at least 8 characters');
+      throw new Error("Password must be at least 8 characters");
     }
 
     return new Password(plainText, false);
@@ -23,7 +23,7 @@ export class Password {
 
   static compare(plainText: string, hashedValue: string): Promise<boolean> {
     if (plainText.length < 8) {
-      throw new Error('Password must be at least 8 characters');
+      throw new Error("Password must be at least 8 characters");
     }
 
     return Promise.resolve(plainText === hashedValue);

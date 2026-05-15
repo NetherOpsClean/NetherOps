@@ -16,13 +16,13 @@
     "lint:fix": "eslint . --fix",
     "format:check": "prettier --check \"src/**/*.ts\"",
     "format:fix": "prettier --write \"src/**/*.ts\"",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "test:unit": "jest --testPathPatterns=\\.spec\\.ts$ --coverage --passWithNoTests",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "prepare": "node --eval \"if (process.env.HUSKY !== '0') { require('child_process').execSync('husky', {stdio: 'inherit'}) }\""
+    "prepare": "husky"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
