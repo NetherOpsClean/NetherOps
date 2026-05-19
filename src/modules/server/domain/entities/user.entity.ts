@@ -1,42 +1,51 @@
-import { Password } from "../value-objects/password.vo";
+import { Email } from "../value-objects/email.vo";
+import { PasswordHash } from "../value-objects/password-hash.vo";
+import { UserId } from "../value-objects/user-id.vo";
+import { UserRole } from "../value-objects/user-role.vo";
 
 export class User {
-  constructor(
-    public readonly id: string,
-    public name: string,
-    public email: string,
-    public readonly password: Password,
-    private readonly createdAt: Date = new Date()
-  ) {}
+  private readonly userId: UserId;
+  private email: Email;
+  private password: PasswordHash;
+  private role: UserRole;
 
-  getId(): string {
-    return this.id;
+  constructor(userId: UserId, email: Email, password: PasswordHash, role: UserRole) {
+    this.userId = userId;
+    this.email = email;
+    this.password = password;
+    this.role = role;
   }
 
-  getName(): string {
-    return this.name;
+  static create(email: Email, password: PasswordHash, role: UserRole): User {
+    const userId = UserId.generate();
+    return new User(userId, email, password, role);
   }
 
-  getEmail(): string {
+  getId(): UserId {
+    return this.userId;
+  }
+
+  getEmail(): Email {
     return this.email;
   }
 
-  getPassword(): Password {
+  getPassword(): PasswordHash {
     return this.password;
   }
 
-  updateName(newName: string): void {
-    if (!newName || newName.trim().length === 0) {
-      throw new Error("Name cannot be empty");
-    }
-
-    this.name = newName;
+  getRole(): UserRole {
+    return this.role;
   }
 
-  static create(id: string, name: string, email: string): User {
-    if (!email.includes("@")) {
-      throw new Error("Invalid email");
-    }
-    return new User(id, name, email, Password.create("defaultPassword"));
+  changeEmail(newEmail: Email): void {
+    this.email = newEmail;
+  }
+
+  changePassword(newPassword: PasswordHash): void {
+    this.password = newPassword;
+  }
+
+  changeRole(newRole: UserRole): void {
+    this.role = newRole;
   }
 }
