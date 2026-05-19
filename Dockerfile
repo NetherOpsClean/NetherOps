@@ -6,22 +6,21 @@ ENV PATH="$PNPM_HOME:$PATH"
 
 FROM base AS deps
 WORKDIR /app
-ENV HUSKY=0
 COPY package.json pnpm-lock.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    npm pkg delete scripts.prepare && \
     pnpm install --frozen-lockfile --prod
 
 FROM base AS builder
 WORKDIR /app
-ENV HUSKY=0
 COPY package.json pnpm-lock.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    npm pkg delete scripts.prepare && \
     pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm run build
 
 FROM node:22-alpine AS production
-RUN corepack enable && corepack prepare pnpm@latest --activate
 WORKDIR /app
 ENV NODE_ENV=production
 
