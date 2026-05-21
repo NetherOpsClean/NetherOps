@@ -4,7 +4,6 @@ export interface CreateServerOptions {
   id: string;
   name: string;
   version: string;
-  type: Server["type"];
   port: number;
   memoryMb: number;
   ownerId: string;
