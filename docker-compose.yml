@@ -1,0 +1,3 @@
+# docker-compose.yml de tu app
+volumes:
+  - /var/run/docker.sock:/var/run/docker.sock

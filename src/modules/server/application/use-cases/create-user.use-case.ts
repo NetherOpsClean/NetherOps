@@ -3,7 +3,7 @@ import { PasswordHash } from "../../domain/value-objects/password-hash.vo";
 import { User } from "../../domain/entities/user.entity";
 import { UserRole } from "../../domain/value-objects/user-role.vo";
 import { Email } from "../../domain/value-objects/email.vo";
-import { UserId } from "../../domain/value-objects/user-id.vo";
+import { UserId, IdFactory } from "../../shared/domain/value-objects/id.vo";
 import { CreateUserDto } from "../dtos/create-user.dto";
 
 export class CreateUserUseCase {
@@ -28,7 +28,7 @@ export class CreateUserUseCase {
 
     const passwordVo = new PasswordHash(dto.password);
 
-    const userId = UserId.generate();
+    const userId = IdFactory.generate<UserId>();
     const newUser = new User(userId, emailVo, passwordVo, userRole);
     await this.userRepository.save(newUser);
   }
