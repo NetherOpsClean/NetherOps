@@ -1,10 +1,7 @@
 export type ServerStatus = "stopped" | "starting" | "running" | "stopping" | "error";
 export type ServerType = "VANILLA" | "PAPER" | "FORGE" | "FABRIC";
 
-import { ServerId } from "../value-objects/server-id.vo";
-import { OwnerId } from "../value-objects/owner-id.vo";
-import { NodeId } from "../value-objects/node-id.vo";
-import { TemplateId } from "../value-objects/template-id.vo";
+import { ServerId, OwnerId, NodeId, TemplateId } from "../../shared/domain/value-objects/id.vo";
 import { MemoryLimit } from "../value-objects/memory-limit.vo";
 import { ServerConfiguration } from "../value-objects/server-configuration";
 
@@ -22,4 +19,17 @@ export class Server {
     private configuration: ServerConfiguration,
     private readonly createdAt: Date
   ) {}
+
+  // Getters
+  getId(): ServerId {
+    return this.id;
+  }
+
+  getName(): string {
+    return this.name;
+  }
+
+  getOwnerId(): OwnerId {
+    return this.ownerId;
+  }
 }

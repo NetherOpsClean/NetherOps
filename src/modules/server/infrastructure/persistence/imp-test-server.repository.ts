@@ -15,11 +15,11 @@ export class InMemoryServerRepository implements IServerRepository {
   }
 
   async findAllByOwner(ownerId: string): Promise<Server[]> {
-    return [...this.store.values()].filter((s) => s.ownerId === ownerId);
+    return [...this.store.values()].filter((s) => s.getOwnerId() === ownerId);
   }
 
   async save(server: Server): Promise<void> {
-    this.store.set(server.id, server);
+    this.store.set(server.getId(), server);
   }
 
   async delete(id: string): Promise<void> {

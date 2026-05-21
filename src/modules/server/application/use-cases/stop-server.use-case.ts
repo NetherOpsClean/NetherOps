@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import {
   type IServerRepository,
   SERVER_REPOSITORY,
@@ -16,13 +16,9 @@ export class StopServerUseCase {
 
   async execute(serverId: string): Promise<void> {
     const server = await this.serverRepository.findById(serverId);
-    if (!server) throw new NotFoundException(`Server ${serverId} not found`);
-    if (!server.isRunning()) throw new BadRequestException("Server is not running");
-
-    await this.containerProvider.stop(server.containerId!);
-    await this.containerProvider.remove(server.containerId!);
-
-    server.markAsStopped();
+    if (!server) {
+      throw new NotFoundException(`Server with ID ${serverId} not found`);
+    }
     await this.serverRepository.save(server);
   }
 }
