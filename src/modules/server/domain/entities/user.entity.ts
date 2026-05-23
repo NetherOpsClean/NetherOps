@@ -1,4 +1,4 @@
-import { Password } from "../value-objects/password.vo";
+import { Password } from "../value-objects/password.vo.js";
 
 export class User {
   constructor(

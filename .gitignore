@@ -59,3 +59,8 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 .env.sqa
 .env.production
 dist/
+
+# Prisma
+/src/generated/
+
+/src/generated/prisma

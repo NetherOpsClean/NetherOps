@@ -1,10 +1,10 @@
-module.exports = {
-  extends: [require.resolve('@commitlint/config-conventional')],
+export default {
+  extends: ["@commitlint/config-conventional"],
   rules: {
-    'scope-enum': [
+    "scope-enum": [
       2,
-      'always',
-      ['server', 'docker', 'auth', 'infra', 'ci', 'deps'],
+      "always",
+      ["shared", "server", "docker", "auth", "database", "config", "ci", "deps"],
     ],
   },
 };
