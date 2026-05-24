@@ -93,6 +93,10 @@ export class Server {
     return this.status;
   }
 
+  isActive(): boolean {
+    return this.status === "RUNNING" || this.status === "STARTING";
+  }
+
   // Business logic methods
   start(): void {
     if (this.status === "RUNNING" || this.status === "STARTING")

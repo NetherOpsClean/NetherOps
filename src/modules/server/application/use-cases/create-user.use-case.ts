@@ -1,9 +1,7 @@
 import { UserRepository } from "../../domain/repositories/user.repository";
-import { PasswordHash } from "../../domain/value-objects/password-hash.vo";
-import { User } from "../../domain/entities/user.entity";
+
 import { UserRole } from "../../domain/value-objects/user-role.vo";
 import { Email } from "../../domain/value-objects/email.vo";
-import { UserId, IdFactory } from "../../shared/domain/value-objects/id.vo";
 import { CreateUserDto } from "../dtos/create-user.dto";
 
 export class CreateUserUseCase {
@@ -25,11 +23,5 @@ export class CreateUserUseCase {
     if (!userRole) {
       throw new Error(`Invalid role: ${dto.role}`);
     }
-
-    const passwordVo = new PasswordHash(dto.password);
-
-    const userId = IdFactory.generate<UserId>();
-    const newUser = new User(userId, emailVo, passwordVo, userRole);
-    await this.userRepository.save(newUser);
   }
 }
