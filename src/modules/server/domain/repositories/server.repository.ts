@@ -1,19 +1,10 @@
+import { ServerId, NodeId } from "../../shared/domain/value-objects/id.vo";
 import { Server } from "../entities/server.entity";
 
-export interface CreateServerOptions {
-  id: string;
-  name: string;
-  version: string;
-  port: number;
-  memoryMb: number;
-  ownerId: string;
-}
-
-export const SERVER_REPOSITORY = Symbol("SERVER_REPOSITORY");
-
-export interface IServerRepository {
-  findById(id: string): Promise<Server | null>;
+export interface ServerRepository {
+  findById(id: ServerId): Promise<Server | null>;
   findAllByOwner(ownerId: string): Promise<Server[]>;
+  findActiveByNodeId(nodeId: NodeId): Promise<Server[]>;
   save(server: Server): Promise<void>;
-  delete(id: string): Promise<void>;
+  delete(id: ServerId): Promise<void>;
 }

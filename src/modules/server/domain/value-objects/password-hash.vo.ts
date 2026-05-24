@@ -1,11 +1,18 @@
-export class PasswordHash {
+export class Password {
   readonly value: string;
 
-  constructor(value: string) {
-    if (!this.isValid(value)) {
+  private constructor(value: string) {
+    this.value = value;
+  }
+
+  static create(hash: string): Password {
+    if (!hash || hash.trim().length === 0) {
+      throw new Error("Password hash cannot be empty");
+    }
+    if (!this.prototype.isValid(hash)) {
       throw new Error("Invalid password hash format");
     }
-    this.value = value;
+    return new Password(hash);
   }
 
   private isValid(hash: string): boolean {
@@ -15,7 +22,7 @@ export class PasswordHash {
     return bcryptRegex.test(hash);
   }
 
-  equals(other: PasswordHash): boolean {
+  equals(other: Password): boolean {
     if (other === null || other === undefined) {
       return false;
     }

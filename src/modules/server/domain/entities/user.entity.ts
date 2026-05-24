@@ -1,51 +1,64 @@
-import { Email } from "../value-objects/email.vo";
-import { PasswordHash } from "../value-objects/password-hash.vo";
-import { UserId, IdFactory } from "../../shared/domain/value-objects/id.vo";
-import { UserRole } from "../value-objects/user-role.vo";
+import { Password } from "../value-objects/password-hash.vo.js";
+import { ResourceQuota } from "../value-objects/resource-quota.vo.js";
 
 export class User {
-  private readonly id: UserId;
-  private email: Email;
-  private password: PasswordHash;
-  private role: UserRole;
+  constructor(
+    private readonly id: string,
+    private name: string,
+    private email: string,
+    private readonly role: string,
+    private readonly quota: ResourceQuota,
+    private readonly password: Password,
+    private readonly createdAt: Date = new Date()
+  ) {}
 
-  constructor(id: UserId, email: Email, password: PasswordHash, role: UserRole) {
-    this.id = id;
-    this.email = email;
-    this.password = password;
-    this.role = role;
-  }
-
-  static create(email: Email, password: PasswordHash, role: UserRole): User {
-    const userId = IdFactory.generate<UserId>();
-    return new User(userId, email, password, role);
-  }
-
-  getId(): UserId {
+  getId(): string {
     return this.id;
   }
 
-  getEmail(): Email {
+  getName(): string {
+    return this.name;
+  }
+
+  getEmail(): string {
     return this.email;
   }
 
-  getPassword(): PasswordHash {
-    return this.password;
+  isAdmin(): boolean {
+    return this.role === "ADMIN";
   }
 
-  getRole(): UserRole {
+  getRole(): string {
     return this.role;
   }
 
-  changeEmail(newEmail: Email): void {
-    this.email = newEmail;
+  getPassword(): Password {
+    return this.password;
   }
 
-  changePassword(newPassword: PasswordHash): void {
-    this.password = newPassword;
+  getQuota(): ResourceQuota {
+    return this.quota;
   }
 
-  changeRole(newRole: UserRole): void {
-    this.role = newRole;
+  updateName(newName: string): void {
+    if (!newName || newName.trim().length === 0) {
+      throw new Error("Name cannot be empty");
+    }
+
+    this.name = newName;
+  }
+
+  static create(id: string, name: string, email: string): User {
+    if (!email.includes("@")) {
+      throw new Error("Invalid email");
+    }
+    return new User(
+      id,
+      name,
+      email,
+      "USER", // Default role
+      ResourceQuota.create(1024),
+      Password.create("defaultPassword")
+    );
   }
 }

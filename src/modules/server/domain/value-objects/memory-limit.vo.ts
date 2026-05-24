@@ -1,11 +1,15 @@
 export class MemoryLimit {
   readonly valueMb: number;
 
-  constructor(valueMb: number) {
+  private constructor(valueMb: number) {
+    this.valueMb = valueMb;
+  }
+
+  static create(valueMb: number): MemoryLimit {
     if (valueMb <= 0) {
       throw new Error("Memory limit must be a positive integer");
     }
-    this.valueMb = valueMb;
+    return new MemoryLimit(valueMb);
   }
 
   equals(other: MemoryLimit): boolean {

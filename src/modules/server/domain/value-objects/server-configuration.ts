@@ -6,7 +6,7 @@ export class ServerConfiguration {
   readonly motd: string;
   readonly cracked: boolean;
 
-  constructor(
+  private constructor(
     maxPlayers: number,
     gameMode: string,
     difficulty: string,
@@ -20,5 +20,16 @@ export class ServerConfiguration {
     this.pvpEnabled = pvpEnabled;
     this.motd = motd;
     this.cracked = cracked;
+  }
+
+  static create(
+    maxPlayers: number,
+    gameMode: string,
+    difficulty: string,
+    pvpEnabled: boolean,
+    motd: string,
+    cracked: boolean
+  ): ServerConfiguration {
+    return new ServerConfiguration(maxPlayers, gameMode, difficulty, pvpEnabled, motd, cracked);
   }
 }
