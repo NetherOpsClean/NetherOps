@@ -26,6 +26,7 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
 
 COPY . .
 RUN pnpm run build
+RUN pnpm prisma generate
 
 FROM node:22-alpine AS production
 WORKDIR /app
@@ -34,7 +35,7 @@ ENV NODE_ENV=production
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY package.json ./
-COPY --from=builder /app/src/generated/prisma ./src/generated/prisma
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
