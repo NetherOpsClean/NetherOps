@@ -14,7 +14,7 @@ export interface ContainerInfo {
 
 export const CONTAINER_PROVIDER = Symbol("CONTAINER_PROVIDER");
 
-export interface IContainerProvider {
+export interface ContainerProvider {
   create(config: ContainerConfig): Promise<string>; // returns containerId
   start(containerId: string): Promise<void>;
   stop(containerId: string): Promise<void>;

@@ -13,9 +13,8 @@ import { MemoryLimit } from "../value-objects/memory-limit.vo.js";
 import { ServerConfiguration } from "../value-objects/server-configuration.vo.js";
 
 export class Server {
-  private readonly id: ServerId;
-
   private constructor(
+    private readonly id: ServerId,
     private readonly name: string,
     private readonly ownerId: UserId,
     private readonly nodeId: NodeId,
@@ -26,9 +25,7 @@ export class Server {
     private allocatedPort: number,
     private configuration: ServerConfiguration,
     private readonly createdAt: Date
-  ) {
-    this.id = IdFactory.generate<ServerId>(); // Genera un nuevo ID para el servidor
-  }
+  ) {}
 
   public static create(
     name: string,
@@ -41,6 +38,7 @@ export class Server {
     configuration: ServerConfiguration
   ): Server {
     return new Server(
+      IdFactory.generate<ServerId>(),
       name,
       ownerId,
       nodeId,
@@ -54,6 +52,35 @@ export class Server {
     );
   }
 
+  public static reconstitute(
+    id: string,
+    name: string,
+    ownerId: UserId,
+    nodeId: NodeId,
+    templateId: TemplateId,
+    memoryLimit: MemoryLimit,
+    diskLimitMb: number,
+    status: ServerStatus,
+    allocatedPort: number,
+    configuration: ServerConfiguration,
+    createdAt: Date
+  ): Server {
+    const server = new Server(
+      IdFactory.load<ServerId>(id),
+      name,
+      ownerId,
+      nodeId,
+      templateId,
+      memoryLimit,
+      diskLimitMb,
+      status,
+      allocatedPort,
+      configuration,
+      createdAt
+    );
+    return server;
+  }
+
   // Getters
   getId(): ServerId {
     return this.id;
@@ -65,6 +92,14 @@ export class Server {
 
   getNodeId(): NodeId {
     return this.nodeId;
+  }
+
+  getTemplateId(): TemplateId {
+    return this.templateId;
+  }
+
+  getName(): string {
+    return this.name;
   }
 
   getMemoryLimit(): MemoryLimit {
@@ -81,6 +116,10 @@ export class Server {
 
   getPort(): number {
     return this.allocatedPort;
+  }
+
+  getConfiguration(): ServerConfiguration {
+    return this.configuration;
   }
 
   getStatus(): ServerStatus {

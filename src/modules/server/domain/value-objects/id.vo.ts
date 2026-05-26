@@ -14,8 +14,8 @@ export type TemplateId = Brand<string, "TemplateId">;
 export const IdFactory = {
   isValid(id: string): boolean {
     if (!id || id.trim().length === 0) return false;
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    return uuidRegex.test(id);
+    //cambiar logica si se usan UUID
+    return true;
   },
 
   /**
