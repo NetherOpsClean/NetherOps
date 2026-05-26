@@ -1,12 +1,67 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
   provider = "postgresql"
 }
 
-//Models
+model User {
+  id        String   @id
+  name      String
+  email     String   @unique
+  role      String   @default("USER")
+  memoryMb  Int      @default(1024)
+  password  String
+  createdAt DateTime @default(now())
+
+  servers Server[]
+}
+
+model Node {
+  id               String   @id
+  alias            String
+  ipAddress        String   @unique
+  memoryCapacityMb Int
+  totalDiskMb      Int
+  portRangeStart   Int
+  portRangeEnd     Int
+  status           String   @default("ACTIVE")
+  createdAt        DateTime @default(now())
+
+  servers Server[]
+}
+
+model Server {
+  id            String   @id
+  name          String
+  ownerId       String
+  nodeId        String
+  templateId    String
+  memoryLimitMb Int
+  diskLimitMb   Int
+  allocatedPort Int
+  status        String   @default("OFFLINE")
+  maxPlayers    Int      @default(20)
+  gameMode      String   @default("SURVIVAL")
+  difficulty    String   @default("NORMAL")
+  pvpEnabled    Boolean  @default(true)
+  motd          String   @default("A Minecraft Server")
+  cracked       Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  owner User @relation(fields: [ownerId], references: [id])
+  node  Node @relation(fields: [nodeId], references: [id])
+  template   Template @relation(fields: [templateId], references: [id])
+}
+
+model Template {
+  id                 String   @id
+  alias              String
+  softwareIdentifier String   @unique
+  startupCommand     String?
+  createdAt          DateTime @default(now())
+
+  servers Server[]
+}

@@ -1,6 +1,8 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { PrismaModule } from "./modules/shared/infrastructure/database/prisma/prisma.module.js";
+import { NodeModule } from "./modules/server/node.module.js";
+import { ServerModule } from "./modules/server/server.module.js";
 
 @Module({
   imports: [
@@ -9,6 +11,8 @@ import { PrismaModule } from "./modules/shared/infrastructure/database/prisma/pr
       envFilePath: [`.env.${process.env.NODE_ENV || "development"}`, ".env"],
     }),
     PrismaModule,
+    NodeModule,
+    ServerModule,
   ],
   providers: [],
 })
