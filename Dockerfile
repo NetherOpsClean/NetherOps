@@ -25,8 +25,8 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm install --frozen-lockfile
 
 COPY . .
-RUN pnpm run build
 RUN pnpm prisma generate
+RUN pnpm run build
 
 FROM node:22-alpine AS production
 WORKDIR /app
@@ -36,6 +36,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY package.json ./
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
