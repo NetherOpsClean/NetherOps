@@ -4,7 +4,7 @@ export default {
     "scope-enum": [
       2,
       "always",
-      ["shared", "server", "docker", "auth", "database", "config", "ci", "deps"],
+      ["shared", "server", "docker", "auth", "database", "config", "ci", "deps", "pipeline"],
     ],
   },
 };
