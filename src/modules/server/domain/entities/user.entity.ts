@@ -1,12 +1,13 @@
 import { Password } from "../value-objects/password-hash.vo.js";
 import { ResourceQuota } from "../value-objects/resource-quota.vo.js";
+import { Role } from "../value-objects/user-role.vo.js";
 
 export class User {
   constructor(
     private readonly id: string,
     private name: string,
     private email: string,
-    private readonly role: string,
+    private readonly role: Role,
     private readonly quota: ResourceQuota,
     private readonly password: Password,
     private readonly createdAt: Date = new Date()
@@ -25,11 +26,11 @@ export class User {
   }
 
   isAdmin(): boolean {
-    return this.role === "ADMIN";
+    return this.role.getValue() === "ADMIN";
   }
 
   getRole(): string {
-    return this.role;
+    return this.role.getValue();
   }
 
   getPassword(): Password {
@@ -48,18 +49,11 @@ export class User {
     this.name = newName;
   }
 
-  static create(id: string, name: string, email: string): User {
+  static create(id: string, name: string, email: string, role: Role, passwordVo: Password): User {
     if (!email.includes("@")) {
       throw new Error("Invalid email");
     }
-    return new User(
-      id,
-      name,
-      email,
-      "USER", // Default role
-      ResourceQuota.create(1024),
-      Password.create("defaultPassword")
-    );
+    return new User(id, name, email, role, ResourceQuota.create(1024), passwordVo);
   }
   static reconstitute(
     id: string,
