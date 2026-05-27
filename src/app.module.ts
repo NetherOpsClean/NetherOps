@@ -3,6 +3,7 @@ import { ConfigModule } from "@nestjs/config";
 import { PrismaModule } from "./modules/shared/infrastructure/database/prisma/prisma.module.js";
 import { NodeModule } from "./modules/server/node.module.js";
 import { ServerModule } from "./modules/server/server.module.js";
+import { AuthModule } from "./modules/server/auth.module.js";
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { ServerModule } from "./modules/server/server.module.js";
     PrismaModule,
     NodeModule,
     ServerModule,
+    AuthModule,
   ],
   providers: [],
 })
