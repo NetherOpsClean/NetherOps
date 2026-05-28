@@ -68,7 +68,7 @@ export class User {
       id,
       name,
       email,
-      role,
+      Role.create(role),
       ResourceQuota.create(memoryMb),
       Password.create(password),
       createdAt
