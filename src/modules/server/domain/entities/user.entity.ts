@@ -61,4 +61,23 @@ export class User {
       Password.create("defaultPassword")
     );
   }
+  static reconstitute(
+    id: string,
+    name: string,
+    email: string,
+    role: string,
+    memoryMb: number,
+    password: string,
+    createdAt: Date
+  ): User {
+    return new User(
+      id,
+      name,
+      email,
+      role,
+      ResourceQuota.create(memoryMb),
+      Password.create(password),
+      createdAt
+    );
+  }
 }
