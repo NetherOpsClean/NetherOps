@@ -1,3 +1,13 @@
-export type GameMode = "SURVIVAL" | "CREATIVE" | "ADVENTURE" | "SPECTATOR";
+export enum GameMode {
+  SURVIVAL = "SURVIVAL",
+  CREATIVE = "CREATIVE",
+  ADVENTURE = "ADVENTURE",
+  SPECTATOR = "SPECTATOR",
+}
 
-export type Difficulty = "PEACEFUL" | "EASY" | "NORMAL" | "HARD";
+export enum Difficulty {
+  PEACEFUL = "PEACEFUL",
+  EASY = "EASY",
+  NORMAL = "NORMAL",
+  HARD = "HARD",
+}

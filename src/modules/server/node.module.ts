@@ -7,6 +7,8 @@ import { NODE_REPOSITORY } from "../server/domain/repositories/node.repository.j
 import { PrismaNodeRepository } from "../server/infrastructure/persistence/prisma/prisma-node.repository.js";
 import { SERVER_REPOSITORY } from "../server/domain/repositories/server.repository.js";
 import { PrismaServerRepository } from "../server/infrastructure/persistence/prisma/prisma-server.repository.js";
+import { DockerContainerProvider } from "../server/infrastructure/docker/docker-container.provider.js";
+import { CONTAINER_PROVIDER } from "../server/domain/ports/container.provider.js";
 
 @Module({
   imports: [PrismaModule],
@@ -16,6 +18,7 @@ import { PrismaServerRepository } from "../server/infrastructure/persistence/pri
     DisableNodeUseCase,
     { provide: NODE_REPOSITORY, useClass: PrismaNodeRepository },
     { provide: SERVER_REPOSITORY, useClass: PrismaServerRepository },
+    { provide: CONTAINER_PROVIDER, useClass: DockerContainerProvider },
   ],
 })
 export class NodeModule {}
