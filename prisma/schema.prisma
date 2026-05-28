@@ -39,7 +39,6 @@ model Server {
   nodeId        String
   templateId    String
   memoryLimitMb Int
-  diskLimitMb   Int
   allocatedPort Int
   status        String   @default("OFFLINE")
   maxPlayers    Int      @default(20)
