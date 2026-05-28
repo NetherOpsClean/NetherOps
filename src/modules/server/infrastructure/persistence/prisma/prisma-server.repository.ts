@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../../../../shared/infrastructure/database/prisma/prisma.service.js";
 import { ServerRepository } from "../../../domain/repositories/server.repository.js";
 import { Server } from "../../../domain/entities/server.entity.js";
+import { GameMode, Difficulty } from "../../../domain/value-objects/configuration.enum.js";
 import {
   ServerId,
   NodeId,
@@ -15,6 +16,34 @@ import { ServerConfiguration } from "../../../domain/value-objects/server-config
 @Injectable()
 export class PrismaServerRepository implements ServerRepository {
   constructor(private readonly prisma: PrismaService) {}
+
+  sumAllocatedMemoryByNodeId(nodeId: NodeId): Promise<number> {
+    return this.prisma.server
+      .aggregate({
+        where: {
+          nodeId: nodeId.toString(),
+          status: { in: ["RUNNING", "STARTING", "STOPPING"] },
+        },
+        _sum: {
+          memoryLimitMb: true,
+        },
+      })
+      .then((result) => result._sum.memoryLimitMb ?? 0);
+  }
+
+  findActivePortsByNodeId(nodeId: NodeId): Promise<number[]> {
+    return this.prisma.server
+      .findMany({
+        where: {
+          nodeId: nodeId.toString(),
+          status: { in: ["RUNNING", "STARTING", "STOPPING"] },
+        },
+        select: {
+          allocatedPort: true,
+        },
+      })
+      .then((servers) => servers.map((s) => s.allocatedPort));
+  }
 
   async findById(id: ServerId): Promise<Server | null> {
     const record = await this.prisma.server.findUnique({
@@ -47,7 +76,6 @@ export class PrismaServerRepository implements ServerRepository {
       update: {
         status: server.getStatus(),
         memoryLimitMb: server.getMemoryMb(),
-        diskLimitMb: server.getDiskLimitMb(),
         allocatedPort: server.getPort(),
       },
       create: {
@@ -57,12 +85,11 @@ export class PrismaServerRepository implements ServerRepository {
         nodeId: server.getNodeId().toString(),
         templateId: server.getTemplateId().toString(),
         memoryLimitMb: server.getMemoryMb(),
-        diskLimitMb: server.getDiskLimitMb(),
         allocatedPort: server.getPort(),
         status: server.getStatus(),
         maxPlayers: server.getConfiguration().maxPlayers,
-        gameMode: server.getConfiguration().gameMode,
-        difficulty: server.getConfiguration().difficulty,
+        gameMode: server.getConfiguration().gameMode as GameMode,
+        difficulty: server.getConfiguration().difficulty as Difficulty,
         pvpEnabled: server.getConfiguration().pvpEnabled,
         motd: server.getConfiguration().motd,
         cracked: server.getConfiguration().cracked,
@@ -83,7 +110,6 @@ export class PrismaServerRepository implements ServerRepository {
     nodeId: string;
     templateId: string;
     memoryLimitMb: number;
-    diskLimitMb: number;
     allocatedPort: number;
     status: string;
     maxPlayers: number;
@@ -101,13 +127,12 @@ export class PrismaServerRepository implements ServerRepository {
       IdFactory.load<NodeId>(record.nodeId),
       IdFactory.load<TemplateId>(record.templateId),
       MemoryLimit.create(record.memoryLimitMb),
-      record.diskLimitMb,
       record.status as Server["status"],
       record.allocatedPort,
       ServerConfiguration.create(
         record.maxPlayers,
-        record.gameMode,
-        record.difficulty,
+        record.gameMode as GameMode,
+        record.difficulty as Difficulty,
         record.pvpEnabled,
         record.motd,
         record.cracked
