@@ -5,6 +5,7 @@ import { SERVER_REPOSITORY } from "../repositories/server.repository.js";
 import { IdFactory, NodeId } from "../value-objects/id.vo.js";
 import { DeleteNodeDto } from "../dtos/delete-node.dto.js";
 import { Injectable, Inject } from "@nestjs/common";
+import { type ContainerProvider, CONTAINER_PROVIDER } from "../ports/container.provider.js";
 
 @Injectable()
 export class DisableNodeUseCase {
@@ -12,7 +13,9 @@ export class DisableNodeUseCase {
     @Inject(NODE_REPOSITORY)
     private readonly nodeRepository: NodeRepository,
     @Inject(SERVER_REPOSITORY)
-    private readonly serverRepository: ServerRepository
+    private readonly serverRepository: ServerRepository,
+    @Inject(CONTAINER_PROVIDER)
+    private readonly containerProvider: ContainerProvider
   ) {}
 
   async execute(dto: DeleteNodeDto): Promise<void> {
@@ -23,12 +26,11 @@ export class DisableNodeUseCase {
     }
 
     node.disable();
-    await this.nodeRepository.save(node);
 
     const activeServers = await this.serverRepository.findActiveByNodeId(nodeId);
     for (const server of activeServers) {
       server.stop();
-      await this.serverRepository.save(server);
+      await this.containerProvider.stop(server.getId().toString());
     }
 
     await this.nodeRepository.save(node);

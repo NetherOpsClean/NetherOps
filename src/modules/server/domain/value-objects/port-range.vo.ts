@@ -5,6 +5,12 @@ export class PortRange {
   ) {}
 
   static create(start: number, end: number): PortRange {
+    if (typeof start !== "number" || !Number.isInteger(start)) {
+      throw new Error("Start port must be a positive integer");
+    }
+    if (typeof end !== "number" || !Number.isInteger(end)) {
+      throw new Error("End port must be a positive integer");
+    }
     if (start < 1 || start > 65535) {
       throw new Error("Start port must be between 1 and 65535");
     }
