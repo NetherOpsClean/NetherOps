@@ -39,7 +39,6 @@ export class NodeController {
       alias: dto.alias,
       ipAddress: dto.ipAddress,
       memoryCapacityMb: dto.memoryCapacityMb,
-      totalDiskMb: dto.totalDiskMb,
       portRangeStart: dto.portRangeStart,
       portRangeEnd: dto.portRangeEnd,
     });
@@ -49,7 +48,6 @@ export class NodeController {
       alias: node.getAlias(),
       ipAddress: node.getIpAddress(),
       memoryCapacityMb: node.getMemoryCapacityMb(),
-      totalDiskMb: node.getTotalDiskMb(),
       portRange: node.getPortRange().getValue(),
       status: node.isDisabled() ? "DISABLED" : "ACTIVE",
     });
