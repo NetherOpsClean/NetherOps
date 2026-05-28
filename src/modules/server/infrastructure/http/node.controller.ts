@@ -1,11 +1,32 @@
-import { Controller, Post, Patch, Param, Body, Res, HttpStatus } from "@nestjs/common";
+import {
+  Controller,
+  Post,
+  Patch,
+  Param,
+  Body,
+  Res,
+  Req,
+  HttpStatus,
+  UseGuards,
+} from "@nestjs/common";
+
 import { type Response } from "express";
+
 import { RegisterNodeUseCase } from "../../domain/use-cases/register-node.use-case.js";
 import { DisableNodeUseCase } from "../../domain/use-cases/disable-node.use-case.js";
+
 import { RegisterNodeDto } from "../../domain/dtos/register-node.dto.js";
 import { Node } from "../../domain/entities/node.entity.js";
 
+import { JwtAuthGuard } from "../../../shared/infrastructure/auth/guards/jwt-auth.guard.js";
+
+import { RolesGuard } from "../../../shared/infrastructure/auth/guards/roles.guard.js";
+
+import { Roles } from "../../../shared/infrastructure/auth/decorators/roles.decorator.js";
+
 @Controller("nodes")
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles("ADMIN")
 export class NodeController {
   constructor(
     private readonly registerNodeUseCase: RegisterNodeUseCase,
@@ -33,10 +54,10 @@ export class NodeController {
   }
 
   @Patch(":id/disable")
-  async disable(@Param("id") id: string, @Res() res: Response): Promise<Response> {
+  async disable(@Param("id") id: string, @Req() req: any, @Res() res: Response): Promise<Response> {
     await this.disableNodeUseCase.execute({
       nodeId: id,
-      requesterId: "admin", // reemplazar por JWT cuando tengas auth
+      requesterId: req.user.id,
     });
 
     return res.status(HttpStatus.OK).json({ message: "Node disabled successfully" });
