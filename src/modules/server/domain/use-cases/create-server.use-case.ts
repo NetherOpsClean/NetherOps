@@ -1,4 +1,5 @@
 import { CreateServerDto } from "../dtos/create-server.dto.js";
+import { Difficulty, GameMode } from "../../domain/value-objects/configuration.enum.js";
 import {
   type ServerRepository,
   SERVER_REPOSITORY,
@@ -40,41 +41,44 @@ export class CreateServerUseCase {
     // Check if the node exists and has enough resources to allocate this server
     const nodeId = IdFactory.load<NodeId>(req.nodeId);
     const node = await this.nodeRepository.findById(nodeId);
-    if (!node) {
-      throw new Error("Node not found");
+    if (!node || node.isDisabled()) {
+      throw new Error("Node not available");
     }
+    const usedMemory = await this.serverRepository.sumAllocatedMemoryByNodeId(nodeId);
+    const usedPorts = await this.serverRepository.findActivePortsByNodeId(nodeId);
 
-    const activeServers = await this.serverRepository.findActiveByNodeId(nodeId);
-    const usedMemory = activeServers.reduce(
-      (total, server) => total + server.getMemoryLimit().valueMb,
-      0
-    );
-    const usedDisk = activeServers.reduce((total, server) => total + server.getDiskLimitMb(), 0);
-    const usedPorts = activeServers.map((s) => s.getPort());
-
-    if (!node.canAllocate(usedMemory, usedDisk, memoryLimit.valueMb, req.diskLimitMb)) {
+    if (!node.canAllocate(usedMemory, memoryLimit.valueMb)) {
       throw new Error("Node does not have enough resources to allocate this server");
     }
 
     const port = node.getValidPort(usedPorts);
-    // Create the server configuration value object
+
+    if (Object.values(GameMode).indexOf(req.configuration.gameMode as GameMode) === -1) {
+      throw new Error(`Invalid game mode: ${req.configuration.gameMode}`);
+    }
+
+    if (Object.values(Difficulty).indexOf(req.configuration.difficulty as Difficulty) === -1) {
+      throw new Error(`Invalid difficulty: ${req.configuration.difficulty}`);
+    }
+
+    const gameMode = GameMode[req.configuration.gameMode as keyof typeof GameMode];
+    const dificulty = Difficulty[req.configuration.difficulty as keyof typeof Difficulty];
+
     const configuration = ServerConfiguration.create(
       req.configuration.maxPlayers,
-      req.configuration.gameMode,
-      req.configuration.difficulty,
+      gameMode,
+      dificulty,
       req.configuration.pvpEnabled,
       req.configuration.motd,
       req.configuration.cracked
     );
 
-    // Create the server entity
     const newServer = Server.create(
       req.name,
       ownerId,
       nodeId,
       IdFactory.load<TemplateId>(req.templateId),
       memoryLimit,
-      req.diskLimitMb,
       port,
       configuration
     );

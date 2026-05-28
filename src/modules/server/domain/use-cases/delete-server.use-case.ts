@@ -3,11 +3,13 @@ import { IdFactory, ServerId, UserId } from "../value-objects/id.vo.js";
 import { DeleteServerDto } from "../dtos/delete-server.dto.js";
 import { NodeRepository } from "../../domain/repositories/node.repository.js";
 import { UserRepository } from "../../domain/repositories/user.repository.js";
+import { ContainerProvider } from "../../domain/ports/container.provider.js";
 
 export class DeleteServerUseCase {
   constructor(
     private serverRepository: ServerRepository,
     private nodeRepository: NodeRepository,
+    private containerProvider: ContainerProvider,
     private userRepository: UserRepository
   ) {}
 
@@ -29,12 +31,12 @@ export class DeleteServerUseCase {
       throw new Error("Requester does not have permission to delete this server");
     }
 
-    // If the server is running, stop it before deleting
     if (server.getStatus() === "RUNNING") {
       server.stop();
-      await this.serverRepository.save(server);
+      await this.containerProvider.stop(server.getId().toString());
     }
 
     await this.serverRepository.delete(server.getId());
+    await this.containerProvider.remove(server.getId().toString());
   }
 }
