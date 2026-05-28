@@ -20,7 +20,6 @@ export class Server {
     private readonly nodeId: NodeId,
     private readonly templateId: TemplateId,
     private memoryLimit: MemoryLimit,
-    private diskLimitMb: number,
     private status: ServerStatus,
     private allocatedPort: number,
     private configuration: ServerConfiguration,
@@ -33,7 +32,6 @@ export class Server {
     nodeId: NodeId,
     templateId: TemplateId,
     memoryLimit: MemoryLimit,
-    diskLimitMb: number,
     port: number,
     configuration: ServerConfiguration
   ): Server {
@@ -44,11 +42,10 @@ export class Server {
       nodeId,
       templateId,
       memoryLimit,
-      diskLimitMb,
-      "OFFLINE", // Estado inicial
+      "OFFLINE",
       port,
       configuration,
-      new Date() // Fecha de creación
+      new Date()
     );
   }
 
@@ -59,7 +56,6 @@ export class Server {
     nodeId: NodeId,
     templateId: TemplateId,
     memoryLimit: MemoryLimit,
-    diskLimitMb: number,
     status: ServerStatus,
     allocatedPort: number,
     configuration: ServerConfiguration,
@@ -72,7 +68,6 @@ export class Server {
       nodeId,
       templateId,
       memoryLimit,
-      diskLimitMb,
       status,
       allocatedPort,
       configuration,
@@ -106,10 +101,6 @@ export class Server {
     return this.memoryLimit;
   }
 
-  getDiskLimitMb(): number {
-    return this.diskLimitMb;
-  }
-
   getMemoryMb(): number {
     return this.memoryLimit.valueMb;
   }
@@ -126,6 +117,23 @@ export class Server {
     return this.status;
   }
 
+  // Status checkers
+  isOffline(): boolean {
+    return this.status === "OFFLINE";
+  }
+
+  isStarting(): boolean {
+    return this.status === "STARTING";
+  }
+
+  isRunning(): boolean {
+    return this.status === "RUNNING";
+  }
+
+  isStopping(): boolean {
+    return this.status === "STOPPING";
+  }
+
   isActive(): boolean {
     return this.status === "RUNNING" || this.status === "STARTING";
   }
@@ -134,6 +142,7 @@ export class Server {
   start(): void {
     if (this.status === "RUNNING" || this.status === "STARTING")
       throw new Error("Server is already running or starting");
+    if (this.status !== "OFFLINE") throw new Error("Cannot start server");
     this.status = "STARTING";
   }
 
@@ -162,14 +171,14 @@ export class Server {
   }
 
   changeMemoryLimit(newLimit: MemoryLimit): void {
-    if (this.getStatus() === "RUNNING") {
+    if (this.getStatus() === "RUNNING" || this.getStatus() === "STARTING") {
       throw new Error("Cannot change memory limit while server is running");
     }
     this.memoryLimit = newLimit;
   }
 
   changeConfiguration(newConfig: ServerConfiguration): void {
-    if (this.getStatus() === "RUNNING") {
+    if (this.getStatus() === "RUNNING" || this.getStatus() === "STARTING") {
       throw new Error("Cannot change configuration while server is running");
     }
     this.configuration = newConfig;

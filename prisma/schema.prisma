@@ -29,7 +29,6 @@ model Node {
   alias            String
   ipAddress        String   @unique
   memoryCapacityMb Int
-  totalDiskMb      Int
   portRangeStart   Int
   portRangeEnd     Int
   status           String   @default("ACTIVE")
@@ -45,7 +44,6 @@ model Server {
   nodeId        String
   templateId    String
   memoryLimitMb Int
-  diskLimitMb   Int
   allocatedPort Int
   status        String   @default("OFFLINE")
   maxPlayers    Int      @default(20)
