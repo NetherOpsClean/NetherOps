@@ -32,6 +32,7 @@ export class PrismaNodeRepository implements NodeRepository {
         alias: node.getAlias(),
         ipAddress: node.getIpAddress(),
         memoryCapacityMb: node.getMemoryCapacityMb(),
+        totalDiskMb: node.getTotalDiskMb(),
         portRangeStart: portRange.start,
         portRangeEnd: portRange.end,
         status: "ACTIVE",
@@ -50,6 +51,7 @@ export class PrismaNodeRepository implements NodeRepository {
     alias: string;
     ipAddress: string;
     memoryCapacityMb: number;
+    totalDiskMb: number;
     portRangeStart: number;
     portRangeEnd: number;
     status: string;
@@ -62,6 +64,7 @@ export class PrismaNodeRepository implements NodeRepository {
       record.memoryCapacityMb,
       record.portRangeStart,
       record.portRangeEnd,
+      record.totalDiskMb,
       record.status as "ACTIVE" | "DISABLED",
       record.createdAt
     );

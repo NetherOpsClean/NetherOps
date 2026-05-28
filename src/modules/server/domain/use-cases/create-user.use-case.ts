@@ -1,19 +1,14 @@
 import { UserRepository } from "../../domain/repositories/user.repository.js";
 
-import { Role } from "../../domain/value-objects/user-role.vo.js";
+import { UserRole } from "../../domain/value-objects/user-role.vo.js";
 import { Email } from "../../domain/value-objects/email.vo.js";
 import { CreateUserDto } from "../dtos/create-user.dto.js";
-import { PasswordHasherPort } from "../ports/password-hasher.port.js";
-import { Password } from "../value-objects/password-hash.vo.js";
-import { User } from "../entities/user.entity.js";
 
 export class CreateUserUseCase {
   private userRepository: UserRepository;
-  private passwordHasher: PasswordHasherPort;
 
-  constructor(userRepository: UserRepository, passwordHasher: PasswordHasherPort) {
+  constructor(userRepository: UserRepository) {
     this.userRepository = userRepository;
-    this.passwordHasher = passwordHasher;
   }
 
   async execute(dto: CreateUserDto): Promise<void> {
@@ -24,12 +19,9 @@ export class CreateUserUseCase {
       throw new Error("User with this email already exists");
     }
 
-    const hashedPasswordString = await this.passwordHasher.hash(dto.password);
-    const passwordVo = Password.create(hashedPasswordString);
-    const roleVo = Role.create(dto.role);
-
-    const newUser = User.create(crypto.randomUUID(), dto.name, dto.email, roleVo, passwordVo);
-
-    await this.userRepository.save(newUser);
+    const userRole = UserRole[dto.role as keyof typeof UserRole];
+    if (!userRole) {
+      throw new Error(`Invalid role: ${dto.role}`);
+    }
   }
 }

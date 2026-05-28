@@ -6,7 +6,7 @@ export class MemoryLimit {
   }
 
   static create(valueMb: number): MemoryLimit {
-    if (valueMb <= 0 || typeof valueMb !== "number" || !Number.isInteger(valueMb)) {
+    if (valueMb <= 0) {
       throw new Error("Memory limit must be a positive integer");
     }
     return new MemoryLimit(valueMb);

@@ -23,7 +23,13 @@ export class RegisterNodeUseCase {
       throw new Error("The port range overlaps with an existing node");
     }
 
-    const newNode = Node.create(dto.alias, dto.ipAddress, dto.memoryCapacityMb, portRange);
+    const newNode = Node.create(
+      dto.alias,
+      dto.ipAddress,
+      dto.memoryCapacityMb,
+      portRange,
+      dto.totalDiskMb
+    );
 
     await this.nodeRepository.save(newNode);
     return newNode;

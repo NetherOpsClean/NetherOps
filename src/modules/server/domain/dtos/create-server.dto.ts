@@ -4,6 +4,7 @@ export class CreateServerDto {
   nodeId: string;
   templateId: string;
   memoryLimitMb: number;
+  diskLimitMb: number;
   configuration: {
     maxPlayers: number;
     gameMode: string;
@@ -19,6 +20,7 @@ export class CreateServerDto {
     nodeId: string,
     templateId: string,
     memoryLimitMb: number,
+    diskLimitMb: number,
     maxPlayers: number,
     gameMode: string,
     difficulty: string,
@@ -31,6 +33,7 @@ export class CreateServerDto {
     this.nodeId = nodeId;
     this.templateId = templateId;
     this.memoryLimitMb = memoryLimitMb;
+    this.diskLimitMb = diskLimitMb;
     this.configuration = {
       maxPlayers: maxPlayers,
       gameMode: gameMode,
