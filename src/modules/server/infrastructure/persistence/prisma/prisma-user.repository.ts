@@ -17,6 +17,7 @@ export class PrismaUserRepository implements UserRepository {
   constructor(prisma: PrismaService) {
     this.prisma = prisma;
   }
+  
   async findByEmail(email: Email): Promise<User | null> {
     const record = await this.prisma.user.findUnique({
       where: { email: email.toString() },
@@ -30,12 +31,18 @@ export class PrismaUserRepository implements UserRepository {
 
   async findById(id: UserId): Promise<User | null> {
     const record = await this.prisma.user.findUnique({
-      where: { id: id.toString() },
+      where: { id: id as string },
     });
-    if (!record) {
-      return null;
-    }
-    return this.toDomain(record);
+
+    return record ? this.toDomain(record) : null;
+  }
+
+  async findByEmail(email: Email): Promise<User | null> {
+    const record = await this.prisma.user.findUnique({
+      where: { email: email.toString() },
+    });
+
+    return record ? this.toDomain(record) : null;
   }
 
   async findAll(): Promise<User[]> {
@@ -54,21 +61,31 @@ export class PrismaUserRepository implements UserRepository {
         id: user.getId(),
         name: user.getName(),
         email: user.getEmail(),
+        role: user.getRole(),
+        memoryMb: user.getQuota().getValue(),
         password: user.getPassword().toString(),
-        role: user.getRole() as UserRole,
       },
     });
-    return this.toDomain(record);
+
+    return user;
   }
 
-  private toDomain(record: PrismaUser): User {
-    return new User(
+  private toDomain(record: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    memoryMb: number;
+    password: string;
+    createdAt: Date;
+  }): User {
+    return User.reconstitute(
       record.id,
       record.name,
       record.email,
-      Role.create(record.role),
-      ResourceQuota.create(1024),
-      Password.create(record.password),
+      record.role,
+      record.memoryMb,
+      record.password,
       record.createdAt
     );
   }
