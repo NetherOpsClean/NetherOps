@@ -10,18 +10,27 @@ import { PASSWORD_HASHER, PasswordHasherPort } from "./domain/ports/password-has
 import { TOKEN_PROVIDER, TokenProviderPort } from "./domain/ports/token-provider.port.js";
 import { AuthController } from "./infrastructure/http/auth.controller.js";
 import { CreateUserUseCase } from "./domain/use-cases/create-user.use-case.js";
+import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy.js";
+import { PassportModule } from "@nestjs/passport";
+import { ConfigModule } from "@nestjs/config";
+import { ConfigService } from "@nestjs/config";
 
 @Module({
   imports: [
     PrismaModule,
-    JwtModule.register({
-      global: true,
-      secret: process.env.JWT_SECRET || "clave_secreta_de_desarrollo",
-      signOptions: { expiresIn: "2h" },
+    PassportModule,
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>("JWT_SECRET") || "clave_secreta_de_desarrollo",
+        signOptions: { expiresIn: "1h" },
+      }),
     }),
   ],
   controllers: [AuthController],
   providers: [
+    JwtStrategy,
     { provide: USER_REPOSITORY, useClass: PrismaUserRepository },
     { provide: PASSWORD_HASHER, useClass: BcryptPasswordHasher },
     { provide: TOKEN_PROVIDER, useClass: JwtTokenProvider },
@@ -48,5 +57,6 @@ import { CreateUserUseCase } from "./domain/use-cases/create-user.use-case.js";
       inject: [USER_REPOSITORY, PASSWORD_HASHER, TOKEN_PROVIDER],
     },
   ],
+  exports: [JwtModule, PassportModule],
 })
 export class AuthModule {}
