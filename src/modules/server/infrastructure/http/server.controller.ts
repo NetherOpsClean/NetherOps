@@ -106,6 +106,7 @@ export class ServerController {
     return res.status(HttpStatus.OK).json(usersWithEmail);
   }
 
+  //comentario táctico
   @Post(":id/start")
   async start(
     @Param("id") id: string,
