@@ -4,6 +4,7 @@ import { PrismaModule } from "./modules/shared/infrastructure/database/prisma/pr
 import { NodeModule } from "./modules/server/node.module.js";
 import { ServerModule } from "./modules/server/server.module.js";
 import { AuthModule } from "./modules/server/auth.module.js";
+import { TemplateModule } from "./modules/server/template.module.js";
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { AuthModule } from "./modules/server/auth.module.js";
     NodeModule,
     ServerModule,
     AuthModule,
+    TemplateModule,
   ],
   providers: [],
 })
