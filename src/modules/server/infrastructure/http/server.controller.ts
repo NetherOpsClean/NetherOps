@@ -8,6 +8,7 @@ import {
   Res,
   HttpStatus,
   Inject,
+  UseGuards,
 } from "@nestjs/common";
 import { type Response } from "express";
 import { CreateServerUseCase } from "../../domain/use-cases/create-server.use-case.js";
@@ -22,8 +23,11 @@ import { StartServerDto } from "../../domain/dtos/start-server.dto.js";
 import { StartServerUseCase } from "../../domain/use-cases/start-server.use-case.js";
 import { StopServerDto } from "../../domain/dtos/stop-server.dto.js";
 import { StopServerUseCase } from "../../domain/use-cases/stop-server.use-case.js";
+import { JwtAuthGuard } from "./guards/jwt-auth.guard.js";
+import { CurrentUserId } from "./decorators/current-user-id.decorator.js";
 
 @Controller("servers")
+@UseGuards(JwtAuthGuard)
 export class ServerController {
   constructor(
     private readonly createServerUseCase: CreateServerUseCase,
@@ -43,10 +47,14 @@ export class ServerController {
   }
 
   @Delete(":id")
-  async delete(@Param("id") id: string, @Res() res: Response): Promise<Response> {
+  async delete(
+    @Param("id") id: string,
+    @CurrentUserId() userId: string,
+    @Res() res: Response
+  ): Promise<Response> {
     await this.deleteServerUseCase.execute({
       serverId: id,
-      requesterId: "bd67976b-4bec-421e-979e-a8691e65a7db", // reemplazar por JWT cuando tengas auth
+      requesterId: userId,
     });
     return res.status(HttpStatus.OK).json({ message: "Server deleted successfully" });
   }
@@ -58,9 +66,9 @@ export class ServerController {
     return res.status(HttpStatus.CREATED).json({ message: "User added to server successfully" });
   }
 
-  @Get(":id")
-  async get(@Param("id") id: string, @Res() res: Response): Promise<Response> {
-    const servers = await this.getUserServers.execute(id);
+  @Get("")
+  async get(@CurrentUserId() userId: string, @Res() res: Response): Promise<Response> {
+    const servers = await this.getUserServers.execute(userId);
     return res.status(HttpStatus.OK).json(servers);
   }
 
@@ -77,10 +85,14 @@ export class ServerController {
   }
 
   @Post(":id/start")
-  async start(@Param("id") id: string, @Res() res: Response): Promise<Response> {
+  async start(
+    @Param("id") id: string,
+    @CurrentUserId() userId: string,
+    @Res() res: Response
+  ): Promise<Response> {
     const dto: StartServerDto = {
       serverId: id,
-      requesterId: "user-123",
+      requesterId: userId,
     };
 
     await this.startServerUseCase.execute(dto);
@@ -91,8 +103,12 @@ export class ServerController {
   }
 
   @Post(":id/stop")
-  async stop(@Param("id") id: string, @Res() res: Response): Promise<Response> {
-    const dto = new StopServerDto(id, "user-123");
+  async stop(
+    @Param("id") id: string,
+    @CurrentUserId() userId: string,
+    @Res() res: Response
+  ): Promise<Response> {
+    const dto = new StopServerDto(id, userId);
 
     await this.stopServerUseCase.execute(dto);
 
