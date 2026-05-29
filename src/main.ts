@@ -5,7 +5,7 @@ import { WsAdapter } from "@nestjs/platform-ws";
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://netherops.larchy.xyz"],
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
   });
