@@ -20,6 +20,8 @@ import { StopServerUseCase } from "./domain/use-cases/stop-server.use-case.js";
 import { AuthModule } from "./auth.module.js";
 import { TEMPLATE_REPOSITORY } from "./domain/repositories/template.repository.js";
 import { PrismaTemplateRepository } from "./infrastructure/persistence/prisma/prisma-template.repository.js";
+import { SendServerCommandUseCase } from "./domain/use-cases/send-server-command.use-case.js";
+import { ConsoleGateway } from "./infrastructure/ws/console.gateway.js";
 
 @Module({
   imports: [PrismaModule, AuthModule],
@@ -31,6 +33,8 @@ import { PrismaTemplateRepository } from "./infrastructure/persistence/prisma/pr
     GetUserServersUseCase,
     StartServerUseCase,
     StopServerUseCase,
+    SendServerCommandUseCase,
+    ConsoleGateway,
     { provide: SERVER_REPOSITORY, useClass: PrismaServerRepository },
     { provide: SERVER_ACCESS_REPOSITORY, useClass: PrismaServerAccessRepository },
     { provide: USER_REPOSITORY, useClass: PrismaUserRepository },

@@ -1,3 +1,5 @@
+import type { Readable } from "node:stream";
+
 export interface ContainerConfig {
   serverId: string;
   name: string;
@@ -29,4 +31,6 @@ export interface ContainerProvider {
   stop(containerId: string): Promise<void>;
   remove(containerId: string): Promise<void>;
   getInfo(containerId: string): Promise<ContainerInfo>;
+  executeCommand(serverId: string, command: string): Promise<void>;
+  getLogsStream(containerId: string): Promise<Readable>;
 }

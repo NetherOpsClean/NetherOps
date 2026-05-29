@@ -27,6 +27,7 @@ import { JwtAuthGuard } from "./guards/jwt-auth.guard.js";
 import { CurrentUserId } from "./decorators/current-user-id.decorator.js";
 import { USER_REPOSITORY, type UserRepository } from "../../domain/repositories/user.repository.js";
 import { IdFactory, UserId } from "../../domain/value-objects/id.vo.js";
+import { SendServerCommandUseCase } from "../../domain/use-cases/send-server-command.use-case.js";
 
 @Controller("servers")
 @UseGuards(JwtAuthGuard)
@@ -41,7 +42,8 @@ export class ServerController {
     private readonly userRepository: UserRepository,
     private readonly getUserServers: GetUserServersUseCase,
     private readonly startServerUseCase: StartServerUseCase,
-    private readonly stopServerUseCase: StopServerUseCase
+    private readonly stopServerUseCase: StopServerUseCase,
+    private readonly sendCommandUseCase: SendServerCommandUseCase
   ) {}
 
   @Post()
@@ -136,5 +138,18 @@ export class ServerController {
     await this.stopServerUseCase.execute(dto);
 
     return res.status(HttpStatus.OK).json({ message: "Server stopped successfully" });
+  }
+
+  @Post(":id/command")
+  async sendCommand(
+    @Param("id") id: string,
+    @CurrentUserId() userId: string,
+    @Body("command") command: string,
+    @Res() res: Response
+  ): Promise<Response> {
+    await this.sendCommandUseCase.execute(id, userId, command);
+    return res.status(HttpStatus.OK).json({
+      message: "Comando enviado a la consola exitosamente",
+    });
   }
 }
