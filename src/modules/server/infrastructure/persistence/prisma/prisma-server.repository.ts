@@ -38,7 +38,6 @@ export class PrismaServerRepository implements ServerRepository {
       .findMany({
         where: {
           nodeId: nodeId.toString(),
-          status: { in: ["RUNNING", "STARTING", "STOPPING"] },
         },
         select: {
           allocatedPort: true,
