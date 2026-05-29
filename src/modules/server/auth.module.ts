@@ -5,7 +5,7 @@ import { USER_REPOSITORY, UserRepository } from "./domain/repositories/user.repo
 import { PrismaUserRepository } from "./infrastructure/persistence/prisma/prisma-user.repository.js";
 import { BcryptPasswordHasher } from "./infrastructure/security/bcrypt-password-hasher.adapter.js";
 import { JwtTokenProvider } from "./infrastructure/security/jwt-token-provider.adapter.js";
-import { AuthenticateUserUseCase } from "./domain/use-cases/autenticate-user.use-case.js";
+import { AuthenticateUserUseCase } from "./domain/use-cases/authenticate-user.use-case.js";
 import { PASSWORD_HASHER, PasswordHasherPort } from "./domain/ports/password-hasher.port.js";
 import { TOKEN_PROVIDER, TokenProviderPort } from "./domain/ports/token-provider.port.js";
 import { AuthController } from "./infrastructure/http/auth.controller.js";

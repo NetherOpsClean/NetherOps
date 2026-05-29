@@ -22,7 +22,7 @@ export class AuthenticateUserUseCase {
   async execute(dto: AuthenticateUserDto): Promise<{ accessToken: string }> {
     const AUTH_ERROR = "Invalid Credentials";
 
-    const emailVo = new Email(dto.email);
+    const emailVo = Email.create(dto.email);
 
     const user = await this.userRepository.findByEmail(emailVo);
     if (!user) {

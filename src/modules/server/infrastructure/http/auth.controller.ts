@@ -1,6 +1,6 @@
 import { Body, Controller, HttpStatus, Post, Res } from "@nestjs/common";
 import { CreateUserUseCase } from "../../domain/use-cases/create-user.use-case.js";
-import { AuthenticateUserUseCase } from "../../domain/use-cases/autenticate-user.use-case.js";
+import { AuthenticateUserUseCase } from "../../domain/use-cases/authenticate-user.use-case.js";
 import { CreateUserDto } from "../../domain/dtos/create-user.dto.js";
 import { AuthenticateUserDto } from "../../domain/dtos/authenticate-user.dto.js";
 import { type Response } from "express";
