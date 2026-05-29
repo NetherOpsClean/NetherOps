@@ -17,7 +17,7 @@ export class CreateUserUseCase {
   }
 
   async execute(dto: CreateUserDto): Promise<void> {
-    const emailVo = new Email(dto.email);
+    const emailVo = Email.create(dto.email);
 
     const existingUser = await this.userRepository.findByEmail(emailVo);
     if (existingUser) {
