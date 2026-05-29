@@ -25,6 +25,8 @@ import { StopServerDto } from "../../domain/dtos/stop-server.dto.js";
 import { StopServerUseCase } from "../../domain/use-cases/stop-server.use-case.js";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard.js";
 import { CurrentUserId } from "./decorators/current-user-id.decorator.js";
+import { USER_REPOSITORY, type UserRepository } from "../../domain/repositories/user.repository.js";
+import { IdFactory, UserId } from "../../domain/value-objects/id.vo.js";
 
 @Controller("servers")
 @UseGuards(JwtAuthGuard)
@@ -35,6 +37,8 @@ export class ServerController {
     private readonly addUserToServerUseCase: AddUserToServerUseCase,
     @Inject(SERVER_ACCESS_REPOSITORY)
     private readonly serverAccessRepository: ServerAccessRepository,
+    @Inject(USER_REPOSITORY)
+    private readonly userRepository: UserRepository,
     private readonly getUserServers: GetUserServersUseCase,
     private readonly startServerUseCase: StartServerUseCase,
     private readonly stopServerUseCase: StopServerUseCase
@@ -83,13 +87,23 @@ export class ServerController {
   @Get(":id/users")
   async getUsers(@Param("id") serverId: string, @Res() res: Response): Promise<Response> {
     const accesses = await this.serverAccessRepository.findAllByServer(serverId);
-    return res.status(HttpStatus.OK).json(
-      accesses.map((a) => ({
-        userId: a.getUserId(),
-        role: a.getRole(),
-        createdAt: a.getCreatedAt(),
-      }))
+
+    const usersWithEmail = await Promise.all(
+      accesses.map(async (a) => {
+        const userId = IdFactory.load<UserId>(a.getUserId());
+        const user = await this.userRepository.findById(userId);
+
+        return {
+          userId: a.getUserId(),
+          role: a.getRole(),
+          // Obtenemos el correo del Value Object
+          email: user ? user.getEmail().toString() : "Usuario desconocido",
+          createdAt: a.getCreatedAt(),
+        };
+      })
     );
+
+    return res.status(HttpStatus.OK).json(usersWithEmail);
   }
 
   @Post(":id/start")
