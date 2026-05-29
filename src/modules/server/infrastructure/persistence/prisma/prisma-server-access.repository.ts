@@ -7,6 +7,14 @@ import { ServerAccess, AccessRole } from "../../../domain/entities/server-access
 export class PrismaServerAccessRepository implements ServerAccessRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  findAllByUser(userId: string): Promise<ServerAccess[]> {
+    return this.prisma.serverAccess
+      .findMany({
+        where: { userId },
+      })
+      .then((records) => records.map((r) => this.toDomain(r)));
+  }
+
   async save(access: ServerAccess): Promise<void> {
     await this.prisma.serverAccess.create({
       data: {
