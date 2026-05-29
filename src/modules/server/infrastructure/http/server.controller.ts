@@ -59,11 +59,19 @@ export class ServerController {
     return res.status(HttpStatus.OK).json({ message: "Server deleted successfully" });
   }
 
-  @Post("users")
-  async addUser(@Body() body: AddUserToServerDto, @Res() res: Response): Promise<Response> {
-    const addToServerDto = new AddUserToServerDto(body.ownerId, body.guestId, body.serverId);
+  @Post(":id/users")
+  async addUser(
+    @Param("id") serverId: string,
+    @Body("guestEmail") guestEmail: string,
+    @CurrentUserId() ownerId: string,
+    @Res() res: Response
+  ): Promise<Response> {
+    const addToServerDto = new AddUserToServerDto(ownerId, guestEmail, serverId);
     await this.addUserToServerUseCase.execute(addToServerDto);
-    return res.status(HttpStatus.CREATED).json({ message: "User added to server successfully" });
+
+    return res
+      .status(HttpStatus.CREATED)
+      .json({ message: "Usuario agregado al servidor exitosamente" });
   }
 
   @Get("")

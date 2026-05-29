@@ -1,11 +1,11 @@
 export class AddUserToServerDto {
   ownerId: string;
-  guestId: string;
+  guestEmail: string;
   serverId: string;
 
-  constructor(ownerId: string, guestId: string, serverId: string) {
+  constructor(ownerId: string, guestEmail: string, serverId: string) {
     this.ownerId = ownerId;
-    this.guestId = guestId;
+    this.guestEmail = guestEmail;
     this.serverId = serverId;
   }
 }
