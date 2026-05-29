@@ -7,6 +7,7 @@ export const USER_REPOSITORY = Symbol("USER_REPOSITORY");
 export interface UserRepository {
   findByEmail(email: Email): Promise<User | null>;
   findById(id: UserId): Promise<User | null>;
+  findManyByIds(ids: UserId[]): Promise<User[]>;
   save(user: User): Promise<User>;
   findAll(): Promise<User[]>;
 }

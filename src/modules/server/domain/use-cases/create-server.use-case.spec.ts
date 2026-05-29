@@ -6,12 +6,17 @@ import { CreateServerDto } from "../dtos/create-server.dto.js";
 import { User } from "../../domain/entities/user.entity.js";
 import { Node } from "../../domain/entities/node.entity.js";
 import { jest } from "@jest/globals";
+import { TemplateRepository } from "../repositories/template.repository.js";
+import { ContainerProvider } from "../ports/container.provider.js";
+import { Template } from "@prisma/client";
 
 describe("CreateServerUseCase", () => {
   let useCase: CreateServerUseCase;
   let serverRepository: jest.Mocked<ServerRepository>;
   let userRepository: jest.Mocked<UserRepository>;
   let nodeRepository: jest.Mocked<NodeRepository>;
+  let templateRepository: jest.Mocked<TemplateRepository>;
+  let containerProvider: jest.Mocked<ContainerProvider>;
 
   const validDto: CreateServerDto = {
     name: "Mi Servidor Survival",
@@ -45,7 +50,23 @@ describe("CreateServerUseCase", () => {
       findById: jest.fn(),
     } as unknown as jest.Mocked<UserRepository>;
 
-    useCase = new CreateServerUseCase(serverRepository, userRepository, nodeRepository);
+    templateRepository = {
+      findById: jest.fn(),
+    } as unknown as jest.Mocked<TemplateRepository>;
+
+    containerProvider = {
+      create: jest.fn(),
+      start: jest.fn(),
+      stop: jest.fn(),
+    } as unknown as jest.Mocked<ContainerProvider>;
+
+    useCase = new CreateServerUseCase(
+      serverRepository,
+      userRepository,
+      nodeRepository,
+      templateRepository,
+      containerProvider
+    );
   });
 
   afterEach(() => {
@@ -71,7 +92,14 @@ describe("CreateServerUseCase", () => {
       serverRepository.sumAllocatedMemoryByNodeId.mockResolvedValue(0);
       serverRepository.findActivePortsByNodeId.mockResolvedValue([]);
 
-      await useCase.execute(validDto);
+      const mockTemplate = {
+        softwareIdentifier: "itzg/minecraft-server",
+      };
+      templateRepository.findById.mockResolvedValue(mockTemplate as unknown as Template);
+
+      containerProvider.create.mockResolvedValue("mocked-container-id-123");
+
+      const result = await useCase.execute(validDto);
 
       expect(nodeRepository.findById).toHaveBeenCalledWith("node-456");
       expect(mockNode.canAllocate).toHaveBeenCalledWith(0, 2048);
@@ -79,6 +107,10 @@ describe("CreateServerUseCase", () => {
 
       const savedServer = serverRepository.save.mock.calls[0][0];
       expect(savedServer.getPort()).toBe(25565);
+
+      expect(templateRepository.findById).toHaveBeenCalledWith("temp-789");
+      expect(containerProvider.create).toHaveBeenCalled();
+      expect(result).toBe("mocked-container-id-123");
     });
 
     it("should throw an error if the node does not exist", async () => {

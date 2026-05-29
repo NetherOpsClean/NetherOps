@@ -53,7 +53,7 @@ export class StopServerUseCase {
       throw new ConflictException(errorMessage);
     }
 
-    const containerIdentifier = `mc-${req.serverId}`;
+    const containerIdentifier = req.serverId;
     try {
       await this.containerProvider.stop(containerIdentifier);
     } catch (infraError) {

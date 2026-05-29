@@ -12,6 +12,11 @@ import { Server } from "../../domain/entities/server.entity.js";
 import { IdFactory, NodeId, TemplateId, UserId } from "../value-objects/id.vo.js";
 import { MemoryLimit } from "../../domain/value-objects/memory-limit.vo.js";
 import { Injectable, Inject } from "@nestjs/common";
+import {
+  TEMPLATE_REPOSITORY,
+  type TemplateRepository,
+} from "../repositories/template.repository.js";
+import { CONTAINER_PROVIDER, type ContainerProvider } from "../ports/container.provider.js";
 
 @Injectable()
 export class CreateServerUseCase {
@@ -21,10 +26,14 @@ export class CreateServerUseCase {
     @Inject(USER_REPOSITORY)
     private userRepository: UserRepository,
     @Inject(NODE_REPOSITORY)
-    private nodeRepository: NodeRepository
+    private nodeRepository: NodeRepository,
+    @Inject(TEMPLATE_REPOSITORY)
+    private templateRepository: TemplateRepository,
+    @Inject(CONTAINER_PROVIDER)
+    private containerService: ContainerProvider
   ) {}
 
-  async execute(req: CreateServerDto): Promise<void> {
+  async execute(req: CreateServerDto): Promise<string> {
     const memoryLimit = MemoryLimit.create(req.memoryLimitMb);
 
     const ownerId = IdFactory.load<UserId>(req.ownerId);
@@ -53,6 +62,10 @@ export class CreateServerUseCase {
 
     const port = node.getValidPort(usedPorts);
 
+    const templateId = IdFactory.load<TemplateId>(req.templateId);
+    const template = await this.templateRepository.findById(templateId);
+    if (!template) throw new Error("Template not found");
+
     if (Object.values(GameMode).indexOf(req.configuration.gameMode as GameMode) === -1) {
       throw new Error(`Invalid game mode: ${req.configuration.gameMode}`);
     }
@@ -77,12 +90,26 @@ export class CreateServerUseCase {
       req.name,
       ownerId,
       nodeId,
-      IdFactory.load<TemplateId>(req.templateId),
+      templateId,
       memoryLimit,
       port,
       configuration
     );
 
     await this.serverRepository.save(newServer);
+
+    return await this.containerService.create({
+      serverId: newServer.getId(),
+      name: newServer.getName(),
+      memoryMb: memoryLimit.valueMb,
+      port: port,
+      image: template.softwareIdentifier,
+      gameMode: req.configuration.gameMode,
+      difficulty: req.configuration.difficulty,
+      motd: req.configuration.motd,
+      maxPlayers: req.configuration.maxPlayers,
+      pvpEnabled: req.configuration.pvpEnabled,
+      cracked: req.configuration.cracked,
+    });
   }
 }

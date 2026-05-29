@@ -62,7 +62,7 @@ describe("StartServerUseCase", () => {
       // Assert
       expect(mockServerRepository.findById).toHaveBeenCalled();
       expect(mockServer.start).toHaveBeenCalled();
-      expect(mockContainerProvider.start).toHaveBeenCalledWith("mc-server-1");
+      expect(mockContainerProvider.start).toHaveBeenCalledWith("server-1");
       expect(mockServer.markAsRunning).toHaveBeenCalled();
       expect(mockServerRepository.save).toHaveBeenCalledWith(mockServer);
     });
@@ -79,8 +79,8 @@ describe("StartServerUseCase", () => {
       await expect(useCase.execute(dto)).rejects.toThrow(InternalServerErrorException);
 
       // Assert
-      expect(mockContainerProvider.start).toHaveBeenCalledWith("mc-server-1");
-      expect(mockContainerProvider.stop).toHaveBeenCalledWith("mc-server-1");
+      expect(mockContainerProvider.start).toHaveBeenCalledWith("server-1");
+      expect(mockContainerProvider.stop).toHaveBeenCalledWith("server-1");
     });
   });
 });

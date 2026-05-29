@@ -5,16 +5,17 @@ import {
   ContainerInfo,
   ContainerProvider,
 } from "../../domain/ports/container.provider.js";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class DockerContainerProvider implements ContainerProvider {
   private readonly docker: Dockerode;
   private readonly logger = new Logger(DockerContainerProvider.name);
 
-  constructor() {
-    // Conecta al socket local de Docker.
-    // En producción puedes pasar { host, port } para un daemon remoto.
-    this.docker = new Dockerode({ socketPath: "/var/run/docker.sock" });
+  constructor(private configService: ConfigService) {
+    const dockerHost = this.configService.get<string>("DOCKER_SOCKET_PATH");
+
+    this.docker = new Dockerode(dockerHost ? { host: dockerHost } : undefined);
   }
 
   private async ensureImage(image: string): Promise<void> {
@@ -38,21 +39,27 @@ export class DockerContainerProvider implements ContainerProvider {
   async create(config: ContainerConfig): Promise<string> {
     this.logger.log(`Creating container for server ${config.serverId}`);
 
-    await this.ensureImage("itzg/minecraft-server");
+    await this.ensureImage(config.image);
     const memoryBytes = config.memoryMb * 1024 * 1024;
-    const containerName = `mc-${config.serverId}`;
+    const containerName = config.serverId;
 
     try {
       const container = await this.docker.createContainer({
         name: containerName,
-        Image: "itzg/minecraft-server",
+        Image: config.image,
         Env: [
           "EULA=TRUE",
-          `VERSION=${config.version}`,
-          `TYPE=${config.type}`,
+          `VERSION=LATEST`,
           `MEMORY=${config.memoryMb}M`,
           `SERVER_NAME=${config.name}`,
-          "ONLINE_MODE=FALSE",
+          `ONLINE_MODE=${!config.cracked}`,
+          `MODE=${config.gameMode.toLowerCase()}`,
+          `DIFFICULTY=${config.difficulty.toLowerCase()}`,
+          `MOTD=${config.motd}`,
+          `MAX_PLAYERS=${config.maxPlayers}`,
+          `PVP=${config.pvpEnabled}`,
+          `ONLINE_MODE=${!config.cracked}`,
+          `TYPE=VANILLA`,
         ],
         ExposedPorts: {
           "25565/tcp": {},
@@ -71,7 +78,7 @@ export class DockerContainerProvider implements ContainerProvider {
         },
         Labels: {
           "mc.server-id": config.serverId,
-          "mc.managed-by": "aternos-clone",
+          "mc.managed-by": "netherops",
         },
       });
 

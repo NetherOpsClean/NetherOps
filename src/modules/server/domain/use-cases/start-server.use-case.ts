@@ -53,7 +53,7 @@ export class StartServerUseCase {
       throw new ConflictException(errorMessage);
     }
 
-    const containerIdentifier = `mc-${req.serverId}`;
+    const containerIdentifier = req.serverId;
     await this.containerProvider.start(containerIdentifier);
 
     server.markAsRunning();

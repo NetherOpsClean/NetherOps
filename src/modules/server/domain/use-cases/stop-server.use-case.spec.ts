@@ -74,7 +74,7 @@ describe("StopServerUseCase", () => {
       // Assert
       expect(mockServerRepository.findById).toHaveBeenCalled();
       expect(mockServer.stop).toHaveBeenCalled();
-      expect(mockContainerProvider.stop).toHaveBeenCalledWith("mc-server-1");
+      expect(mockContainerProvider.stop).toHaveBeenCalledWith("server-1");
       expect(mockServer.markAsOffline).toHaveBeenCalled();
       expect(mockServerRepository.save).toHaveBeenCalledWith(mockServer);
     });
@@ -127,7 +127,7 @@ describe("StopServerUseCase", () => {
       // Act & Assert
       await expect(useCase.execute(dto)).rejects.toThrow(InternalServerErrorException);
 
-      expect(mockContainerProvider.stop).toHaveBeenCalledWith("mc-server-1");
+      expect(mockContainerProvider.stop).toHaveBeenCalledWith("server-1");
     });
   });
 });

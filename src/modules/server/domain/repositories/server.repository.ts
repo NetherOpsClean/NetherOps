@@ -5,6 +5,7 @@ export const SERVER_REPOSITORY = Symbol("SERVER_REPOSITORY");
 
 export interface ServerRepository {
   findById(id: ServerId): Promise<Server | null>;
+  findManyByIds(ids: ServerId[]): Promise<Server[]>;
   findAllByOwner(ownerId: UserId): Promise<Server[]>;
   findActiveByNodeId(nodeId: NodeId): Promise<Server[]>;
   sumAllocatedMemoryByNodeId(nodeId: NodeId): Promise<number>;
