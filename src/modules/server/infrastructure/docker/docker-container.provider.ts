@@ -6,6 +6,7 @@ import {
   ContainerProvider,
 } from "../../domain/ports/container.provider.js";
 import { ConfigService } from "@nestjs/config";
+import { Readable } from "node:stream";
 
 @Injectable()
 export class DockerContainerProvider implements ContainerProvider {
@@ -148,6 +149,43 @@ export class DockerContainerProvider implements ContainerProvider {
         return { containerId, status: "stopped" };
       }
       throw new InternalServerErrorException("Could not inspect container");
+    }
+  }
+
+  async executeCommand(containerId: string, command: string): Promise<void> {
+    this.logger.log(`Executing command on ${containerId}: ${command}`);
+
+    try {
+      const container = this.docker.getContainer(containerId);
+
+      const exec = await container.exec({
+        Cmd: ["rcon-cli", command],
+        AttachStdout: true,
+        AttachStderr: true,
+      });
+
+      await exec.start({ Detach: false });
+    } catch (err: unknown) {
+      const dockerError = err as { statusCode?: number };
+
+      if (dockerError.statusCode === 409 || dockerError.statusCode === 404) {
+        this.logger.warn(`Cannot execute command. Container ${containerId} is not running.`);
+        throw new Error("Server is not running");
+      }
+
+      this.logger.error(`Failed to execute command on ${containerId}`, err);
+      throw new InternalServerErrorException("Could not execute server command");
+    }
+  }
+
+  async getLogsStream(containerId: string): Promise<Readable> {
+    try {
+      const container = this.docker.getContainer(containerId);
+      const stream = await container.logs({ follow: true, stdout: true, stderr: true, tail: 100 });
+      return stream as Readable;
+    } catch (error) {
+      this.logger.error(`Could not attach to logs of ${containerId}`, error);
+      throw new Error("Log stream unavailable");
     }
   }
 }
