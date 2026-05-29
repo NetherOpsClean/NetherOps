@@ -18,6 +18,10 @@ import { AddUserToServerDto } from "../../domain/dtos/add-to-server.dto.js";
 import { SERVER_ACCESS_REPOSITORY } from "../../domain/repositories/server-access.repository.js";
 import type { ServerAccessRepository } from "../../domain/repositories/server-access.repository.js";
 import { GetUserServersUseCase } from "../../domain/use-cases/get-user-serves.use-case.js";
+import { StartServerDto } from "../../domain/dtos/start-server.dto.js";
+import { StartServerUseCase } from "../../domain/use-cases/start-server.use-case.js";
+import { StopServerDto } from "../../domain/dtos/stop-server.dto.js";
+import { StopServerUseCase } from "../../domain/use-cases/stop-server.use-case.js";
 
 @Controller("servers")
 export class ServerController {
@@ -27,7 +31,9 @@ export class ServerController {
     private readonly addUserToServerUseCase: AddUserToServerUseCase,
     @Inject(SERVER_ACCESS_REPOSITORY)
     private readonly serverAccessRepository: ServerAccessRepository,
-    private readonly getUserServers: GetUserServersUseCase
+    private readonly getUserServers: GetUserServersUseCase,
+    private readonly startServerUseCase: StartServerUseCase,
+    private readonly stopServerUseCase: StopServerUseCase
   ) {}
 
   @Post()
@@ -68,5 +74,28 @@ export class ServerController {
         createdAt: a.getCreatedAt(),
       }))
     );
+  }
+
+  @Post(":id/start")
+  async start(@Param("id") id: string, @Res() res: Response): Promise<Response> {
+    const dto: StartServerDto = {
+      serverId: id,
+      requesterId: "user-123",
+    };
+
+    await this.startServerUseCase.execute(dto);
+
+    return res
+      .status(HttpStatus.OK)
+      .json({ message: "Server start process initiated successfully" });
+  }
+
+  @Post(":id/stop")
+  async stop(@Param("id") id: string, @Res() res: Response): Promise<Response> {
+    const dto = new StopServerDto(id, "user-123");
+
+    await this.stopServerUseCase.execute(dto);
+
+    return res.status(HttpStatus.OK).json({ message: "Server stopped successfully" });
   }
 }
