@@ -7,6 +7,7 @@ import { NODE_REPOSITORY } from "../server/domain/repositories/node.repository.j
 import { PrismaNodeRepository } from "../server/infrastructure/persistence/prisma/prisma-node.repository.js";
 import { SERVER_REPOSITORY } from "../server/domain/repositories/server.repository.js";
 import { PrismaServerRepository } from "../server/infrastructure/persistence/prisma/prisma-server.repository.js";
+import { GetAllNodesUseCase } from "../server/domain/use-cases/get-all-nodes.use.case.js";
 
 @Module({
   imports: [PrismaModule],
@@ -14,6 +15,7 @@ import { PrismaServerRepository } from "../server/infrastructure/persistence/pri
   providers: [
     RegisterNodeUseCase,
     DisableNodeUseCase,
+    GetAllNodesUseCase,
     { provide: NODE_REPOSITORY, useClass: PrismaNodeRepository },
     { provide: SERVER_REPOSITORY, useClass: PrismaServerRepository },
   ],

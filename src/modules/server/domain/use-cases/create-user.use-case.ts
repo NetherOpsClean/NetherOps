@@ -1,14 +1,19 @@
-import { UserRepository } from "../../domain/repositories/user.repository.js";
-
+import { type UserRepository } from "../../domain/repositories/user.repository.js";
+import { Injectable, Inject } from "@nestjs/common";
 import { Role } from "../../domain/value-objects/user-role.vo.js";
 import { Email } from "../../domain/value-objects/email.vo.js";
 import { CreateUserDto } from "../dtos/create-user.dto.js";
-import { PasswordHasherPort } from "../ports/password-hasher.port.js";
+import { type PasswordHasherPort } from "../ports/password-hasher.port.js";
 import { Password } from "../value-objects/password-hash.vo.js";
 import { User } from "../entities/user.entity.js";
+import { USER_REPOSITORY } from "../../domain/repositories/user.repository.js";
+import { PASSWORD_HASHER } from "../../domain/ports/password-hasher.port.js";
 
+@Injectable()
 export class CreateUserUseCase {
+  @Inject(USER_REPOSITORY)
   private userRepository: UserRepository;
+  @Inject(PASSWORD_HASHER)
   private passwordHasher: PasswordHasherPort;
 
   constructor(userRepository: UserRepository, passwordHasher: PasswordHasherPort) {
