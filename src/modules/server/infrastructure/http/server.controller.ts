@@ -17,6 +17,7 @@ import { CreateServerDto } from "../../domain/dtos/create-server.dto.js";
 import { AddUserToServerDto } from "../../domain/dtos/add-to-server.dto.js";
 import { SERVER_ACCESS_REPOSITORY } from "../../domain/repositories/server-access.repository.js";
 import type { ServerAccessRepository } from "../../domain/repositories/server-access.repository.js";
+import { GetUserServersUseCase } from "../../domain/use-cases/get-user-serves.use-case.js";
 
 @Controller("servers")
 export class ServerController {
@@ -25,7 +26,8 @@ export class ServerController {
     private readonly deleteServerUseCase: DeleteServerUseCase,
     private readonly addUserToServerUseCase: AddUserToServerUseCase,
     @Inject(SERVER_ACCESS_REPOSITORY)
-    private readonly serverAccessRepository: ServerAccessRepository
+    private readonly serverAccessRepository: ServerAccessRepository,
+    private readonly getUserServers: GetUserServersUseCase
   ) {}
 
   @Post()
@@ -52,6 +54,12 @@ export class ServerController {
     const addToServerDto = new AddUserToServerDto(body.ownerId, body.guestId, body.serverId);
     await this.addUserToServerUseCase.execute(addToServerDto);
     return res.status(HttpStatus.CREATED).json({ message: "User added to server successfully" });
+  }
+
+  @Get(":id")
+  async get(@Param("id") id: string, @Res() res: Response): Promise<Response> {
+    const servers = await this.getUserServers.execute(id);
+    return res.status(HttpStatus.OK).json(servers);
   }
 
   @Get(":id/users")

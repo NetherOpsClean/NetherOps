@@ -12,6 +12,7 @@ import { PrismaUserRepository } from "../server/infrastructure/persistence/prism
 import { AddUserToServerUseCase } from "../server/domain/use-cases/add-user-to-server.use-case.js";
 import { SERVER_ACCESS_REPOSITORY } from "../server/domain/repositories/server-access.repository.js";
 import { PrismaServerAccessRepository } from "../server/infrastructure/persistence/prisma/prisma-server-access.repository.js";
+import { GetUserServersUseCase } from "../server/domain/use-cases/get-user-serves.use-case.js";
 
 @Module({
   imports: [PrismaModule],
@@ -20,6 +21,7 @@ import { PrismaServerAccessRepository } from "../server/infrastructure/persisten
     CreateServerUseCase,
     DeleteServerUseCase,
     AddUserToServerUseCase,
+    GetUserServersUseCase,
     { provide: SERVER_REPOSITORY, useClass: PrismaServerRepository },
     { provide: SERVER_ACCESS_REPOSITORY, useClass: PrismaServerAccessRepository },
     { provide: USER_REPOSITORY, useClass: PrismaUserRepository },
