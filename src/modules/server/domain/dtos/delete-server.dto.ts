@@ -1,9 +1,9 @@
 export class DeleteServerDto {
-  id: string;
+  serverId: string;
   requesterId: string;
 
-  constructor(id: string, requesterId: string) {
-    this.id = id;
+  constructor(serverId: string, requesterId: string) {
+    this.serverId = serverId;
     this.requesterId = requesterId;
   }
 }

@@ -39,18 +39,14 @@ export class ServerController {
   @Delete(":id")
   async delete(@Param("id") id: string, @Res() res: Response): Promise<Response> {
     await this.deleteServerUseCase.execute({
-      id,
-      requesterId: "user-123", // reemplazar por JWT cuando tengas auth
+      serverId: id,
+      requesterId: "bd67976b-4bec-421e-979e-a8691e65a7db", // reemplazar por JWT cuando tengas auth
     });
     return res.status(HttpStatus.OK).json({ message: "Server deleted successfully" });
   }
 
-  @Post(":id/users")
-  async addUser(
-    @Param("id") serverId: string,
-    @Body() body: AddUserToServerDto,
-    @Res() res: Response
-  ): Promise<Response> {
+  @Post("users")
+  async addUser(@Body() body: AddUserToServerDto, @Res() res: Response): Promise<Response> {
     const addToServerDto = new AddUserToServerDto(body.ownerId, body.guestId, body.serverId);
     await this.addUserToServerUseCase.execute(addToServerDto);
     return res.status(HttpStatus.CREATED).json({ message: "User added to server successfully" });

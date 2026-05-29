@@ -1,15 +1,15 @@
-import { UserRepository } from "../../domain/repositories/user.repository.js";
-
+import { Injectable, Inject } from "@nestjs/common";
+import { USER_REPOSITORY } from "../../domain/repositories/user.repository.js";
+import type { UserRepository } from "../../domain/repositories/user.repository.js";
 import { UserId, IdFactory } from "../../domain/value-objects/id.vo.js";
-
 import { GetUserProfileResponseDto } from "../dtos/get-user-profile-response.dto.js";
 
+@Injectable()
 export class GetUserProfileUseCase {
-  private userRepository: UserRepository;
-
-  constructor(userRepository: UserRepository) {
-    this.userRepository = userRepository;
-  }
+  constructor(
+    @Inject(USER_REPOSITORY)
+    private readonly userRepository: UserRepository
+  ) {}
 
   async execute(userId: string): Promise<GetUserProfileResponseDto> {
     const user = await this.userRepository.findById(IdFactory.load<UserId>(userId));
