@@ -1,11 +1,12 @@
 export class ServerResponseDto {
-  id: string;
-  name: string;
-  ownerId: string;
-
-  constructor(id: string, name: string, ownerId: string) {
-    this.id = id;
-    this.name = name;
-    this.ownerId = ownerId;
-  }
+  constructor(
+    public readonly id: string,
+    public readonly name: string,
+    public readonly status: "online" | "offline" | "starting",
+    public readonly role: "OWNER" | "GUEST",
+    public readonly node: string,
+    public readonly memory: string,
+    public readonly port: number,
+    public readonly ownerName?: string
+  ) {}
 }

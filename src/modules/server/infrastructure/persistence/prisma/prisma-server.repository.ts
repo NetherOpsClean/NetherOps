@@ -12,6 +12,8 @@ import {
 } from "../../../domain/value-objects/id.vo.js";
 import { MemoryLimit } from "../../../domain/value-objects/memory-limit.vo.js";
 import { ServerConfiguration } from "../../../domain/value-objects/server-configuration.vo.js";
+import { ServerStatus } from "../../../domain/entities/server.entity.js";
+import { Server as PrismaServerModel } from "@prisma/client";
 
 @Injectable()
 export class PrismaServerRepository implements ServerRepository {
@@ -138,6 +140,44 @@ export class PrismaServerRepository implements ServerRepository {
         record.cracked
       ),
       record.createdAt
+    );
+  }
+
+  async findManyByIds(ids: ServerId[]): Promise<Server[]> {
+    if (!ids || ids.length === 0) {
+      return [] as Server[];
+    }
+
+    const prismaServers = await this.prisma.server.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
+
+    return prismaServers.map((model) => this.mapToDomain(model));
+  }
+
+  private mapToDomain(prismaModel: PrismaServerModel): Server {
+    return Server.reconstitute(
+      prismaModel.id,
+      prismaModel.name,
+      IdFactory.load<UserId>(prismaModel.ownerId),
+      IdFactory.load<NodeId>(prismaModel.nodeId),
+      IdFactory.load<TemplateId>(prismaModel.templateId),
+      MemoryLimit.create(prismaModel.memoryLimitMb),
+      prismaModel.status as ServerStatus,
+      prismaModel.allocatedPort,
+      ServerConfiguration.create(
+        prismaModel.maxPlayers,
+        prismaModel.gameMode as GameMode,
+        prismaModel.difficulty as Difficulty,
+        prismaModel.pvpEnabled,
+        prismaModel.motd,
+        prismaModel.cracked
+      ),
+      prismaModel.createdAt
     );
   }
 }

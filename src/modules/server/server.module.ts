@@ -18,6 +18,8 @@ import { GetUserServersUseCase } from "../server/domain/use-cases/get-user-serve
 import { StartServerUseCase } from "./domain/use-cases/start-server.use-case.js";
 import { StopServerUseCase } from "./domain/use-cases/stop-server.use-case.js";
 import { AuthModule } from "./auth.module.js";
+import { TEMPLATE_REPOSITORY } from "./domain/repositories/template.repository.js";
+import { PrismaTemplateRepository } from "./infrastructure/persistence/prisma/prisma-template.repository.js";
 
 @Module({
   imports: [PrismaModule, AuthModule],
@@ -33,6 +35,7 @@ import { AuthModule } from "./auth.module.js";
     { provide: SERVER_ACCESS_REPOSITORY, useClass: PrismaServerAccessRepository },
     { provide: USER_REPOSITORY, useClass: PrismaUserRepository },
     { provide: NODE_REPOSITORY, useClass: PrismaNodeRepository },
+    { provide: TEMPLATE_REPOSITORY, useClass: PrismaTemplateRepository },
     { provide: CONTAINER_PROVIDER, useClass: DockerContainerProvider },
   ],
 })

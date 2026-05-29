@@ -1,10 +1,19 @@
 export interface ContainerConfig {
   serverId: string;
   name: string;
-  version: string;
-  type: string;
+  image: string;
+  gameMode: string;
+  difficulty: string;
   port: number;
   memoryMb: number;
+
+  motd: string;
+  maxPlayers: number;
+  pvpEnabled: boolean;
+  cracked: boolean;
+
+  version?: string;
+  type?: string;
 }
 
 export interface ContainerInfo {

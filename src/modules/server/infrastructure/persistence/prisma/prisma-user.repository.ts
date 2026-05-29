@@ -68,4 +68,32 @@ export class PrismaUserRepository implements UserRepository {
       record.createdAt
     );
   }
+
+  async findManyByIds(ids: UserId[]): Promise<User[]> {
+    if (!ids || ids.length === 0) {
+      return [] as User[];
+    }
+
+    const prismaUsers = await this.prisma.user.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
+
+    return prismaUsers.map((model) => this.mapToDomain(model));
+  }
+
+  private mapToDomain(prismaModel: PrismaUser): User {
+    return User.reconstitute(
+      prismaModel.id,
+      prismaModel.name,
+      prismaModel.email,
+      prismaModel.role,
+      prismaModel.memoryMb,
+      prismaModel.password,
+      prismaModel.createdAt
+    );
+  }
 }
