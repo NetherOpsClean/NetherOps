@@ -8,6 +8,8 @@ import { PrismaServerRepository } from "../server/infrastructure/persistence/pri
 import { NODE_REPOSITORY } from "../server/domain/repositories/node.repository.js";
 import { PrismaNodeRepository } from "../server/infrastructure/persistence/prisma/prisma-node.repository.js";
 import { USER_REPOSITORY } from "../server/domain/repositories/user.repository.js";
+import { CONTAINER_PROVIDER } from "../server/domain/ports/container.provider.js";
+import { DockerContainerProvider } from "../server/infrastructure/docker/docker-container.provider.js";
 import { PrismaUserRepository } from "../server/infrastructure/persistence/prisma/prisma-user.repository.js";
 import { AddUserToServerUseCase } from "../server/domain/use-cases/add-user-to-server.use-case.js";
 import { SERVER_ACCESS_REPOSITORY } from "../server/domain/repositories/server-access.repository.js";
@@ -26,6 +28,7 @@ import { GetUserServersUseCase } from "../server/domain/use-cases/get-user-serve
     { provide: SERVER_ACCESS_REPOSITORY, useClass: PrismaServerAccessRepository },
     { provide: USER_REPOSITORY, useClass: PrismaUserRepository },
     { provide: NODE_REPOSITORY, useClass: PrismaNodeRepository },
+    { provide: CONTAINER_PROVIDER, useClass: DockerContainerProvider },
   ],
 })
 export class ServerModule {}

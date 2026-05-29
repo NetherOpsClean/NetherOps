@@ -52,7 +52,7 @@ describe("DeleteServerUseCase", () => {
 
   describe("Error Scenarios (Guards)", () => {
     it("should throw an error if the server is not found", async () => {
-      const dto: DeleteServerDto = { id: validServerId, requesterId: validOwnerId };
+      const dto: DeleteServerDto = { serverId: validServerId, requesterId: validOwnerId };
 
       mockServerRepository.findById.mockResolvedValue(null);
 
@@ -63,7 +63,7 @@ describe("DeleteServerUseCase", () => {
     });
 
     it("should throw an error if the requester is not found", async () => {
-      const dto: DeleteServerDto = { id: validServerId, requesterId: validOwnerId };
+      const dto: DeleteServerDto = { serverId: validServerId, requesterId: validOwnerId };
 
       mockServerRepository.findById.mockResolvedValue({
         getOwnerId: () => validOwnerId,
@@ -77,7 +77,7 @@ describe("DeleteServerUseCase", () => {
     });
 
     it("should throw an error if the requester is neither the owner nor an admin", async () => {
-      const dto: DeleteServerDto = { id: validServerId, requesterId: validHackerId };
+      const dto: DeleteServerDto = { serverId: validServerId, requesterId: validHackerId };
 
       const mockServer = { getOwnerId: () => validOwnerId } as unknown as Server;
       const mockUser = { isAdmin: () => false } as unknown as User;
@@ -93,7 +93,7 @@ describe("DeleteServerUseCase", () => {
 
   describe("Success Scenarios", () => {
     it("should delete a STOPPED server if requester is the owner", async () => {
-      const dto: DeleteServerDto = { id: validServerId, requesterId: validOwnerId };
+      const dto: DeleteServerDto = { serverId: validServerId, requesterId: validOwnerId };
 
       const mockServer = {
         getId: () => validServerId,
@@ -119,7 +119,7 @@ describe("DeleteServerUseCase", () => {
     });
 
     it("should delete a server if requester is an admin (even if not owner)", async () => {
-      const dto: DeleteServerDto = { id: validServerId, requesterId: validAdminId };
+      const dto: DeleteServerDto = { serverId: validServerId, requesterId: validAdminId };
 
       const mockServer = {
         getId: () => validServerId,
@@ -138,7 +138,7 @@ describe("DeleteServerUseCase", () => {
     });
 
     it("should STOP a RUNNING server before deleting it", async () => {
-      const dto: DeleteServerDto = { id: validServerId, requesterId: validOwnerId };
+      const dto: DeleteServerDto = { serverId: validServerId, requesterId: validOwnerId };
 
       const mockServer = {
         getId: () => validServerId,

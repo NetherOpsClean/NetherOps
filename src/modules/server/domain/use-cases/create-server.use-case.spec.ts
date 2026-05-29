@@ -1,13 +1,16 @@
 import { CreateServerUseCase } from "./create-server.use-case.js";
 import { ServerRepository } from "../../domain/repositories/server.repository.js";
+import { UserRepository } from "../../domain/repositories/user.repository.js";
 import { NodeRepository } from "../../domain/repositories/node.repository.js";
 import { CreateServerDto } from "../dtos/create-server.dto.js";
+import { User } from "../../domain/entities/user.entity.js";
 import { Node } from "../../domain/entities/node.entity.js";
 import { jest } from "@jest/globals";
 
 describe("CreateServerUseCase", () => {
   let useCase: CreateServerUseCase;
   let serverRepository: jest.Mocked<ServerRepository>;
+  let userRepository: jest.Mocked<UserRepository>;
   let nodeRepository: jest.Mocked<NodeRepository>;
 
   const validDto: CreateServerDto = {
@@ -38,7 +41,11 @@ describe("CreateServerUseCase", () => {
       findById: jest.fn(),
     } as unknown as jest.Mocked<NodeRepository>;
 
-    useCase = new CreateServerUseCase(serverRepository, nodeRepository);
+    userRepository = {
+      findById: jest.fn(),
+    } as unknown as jest.Mocked<UserRepository>;
+
+    useCase = new CreateServerUseCase(serverRepository, userRepository, nodeRepository);
   });
 
   afterEach(() => {
@@ -54,6 +61,12 @@ describe("CreateServerUseCase", () => {
       } as unknown as Node;
 
       nodeRepository.findById.mockResolvedValue(mockNode);
+
+      const mockOwner = {
+        getQuota: jest.fn().mockReturnValue({ getValue: () => 4096 }),
+      } as unknown as User;
+
+      userRepository.findById.mockResolvedValue(mockOwner);
 
       serverRepository.sumAllocatedMemoryByNodeId.mockResolvedValue(0);
       serverRepository.findActivePortsByNodeId.mockResolvedValue([]);
@@ -71,6 +84,12 @@ describe("CreateServerUseCase", () => {
     it("should throw an error if the node does not exist", async () => {
       nodeRepository.findById.mockResolvedValue(null);
 
+      const mockOwner = {
+        getQuota: jest.fn().mockReturnValue({ getValue: () => 4096 }),
+      } as unknown as User;
+
+      userRepository.findById.mockResolvedValue(mockOwner);
+
       await expect(useCase.execute(validDto)).rejects.toThrow("Node not available");
       expect(serverRepository.save).not.toHaveBeenCalled();
     });
@@ -81,6 +100,12 @@ describe("CreateServerUseCase", () => {
       } as unknown as Node;
       nodeRepository.findById.mockResolvedValue(mockNode);
 
+      const mockOwner = {
+        getQuota: jest.fn().mockReturnValue({ getValue: () => 4096 }),
+      } as unknown as User;
+
+      userRepository.findById.mockResolvedValue(mockOwner);
+
       await expect(useCase.execute(validDto)).rejects.toThrow("Node not available");
       expect(serverRepository.save).not.toHaveBeenCalled();
     });
@@ -90,6 +115,12 @@ describe("CreateServerUseCase", () => {
         isDisabled: jest.fn().mockReturnValue(false),
         canAllocate: jest.fn().mockReturnValue(false),
       } as unknown as Node;
+
+      const mockOwner = {
+        getQuota: jest.fn().mockReturnValue({ getValue: () => 4096 }),
+      } as unknown as User;
+
+      userRepository.findById.mockResolvedValue(mockOwner);
 
       nodeRepository.findById.mockResolvedValue(mockNode);
 

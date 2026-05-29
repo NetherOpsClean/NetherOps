@@ -4,7 +4,7 @@ import {
   type ServerRepository,
   SERVER_REPOSITORY,
 } from "../../domain/repositories/server.repository.js";
-//import { type UserRepository, USER_REPOSITORY } from "../../domain/repositories/user.repository.js";
+import { type UserRepository, USER_REPOSITORY } from "../../domain/repositories/user.repository.js";
 import { type NodeRepository, NODE_REPOSITORY } from "../../domain/repositories/node.repository.js";
 
 import { ServerConfiguration } from "../../domain/value-objects/server-configuration.vo.js";
@@ -18,8 +18,8 @@ export class CreateServerUseCase {
   constructor(
     @Inject(SERVER_REPOSITORY)
     private serverRepository: ServerRepository,
-    //@Inject(USER_REPOSITORY)
-    //private userRepository: UserRepository,
+    @Inject(USER_REPOSITORY)
+    private userRepository: UserRepository,
     @Inject(NODE_REPOSITORY)
     private nodeRepository: NodeRepository
   ) {}
@@ -28,15 +28,15 @@ export class CreateServerUseCase {
     const memoryLimit = MemoryLimit.create(req.memoryLimitMb);
 
     const ownerId = IdFactory.load<UserId>(req.ownerId);
-    //const owner = await this.userRepository.findById(ownerId);
-    //if (!owner) {
-    //throw new Error("Owner not found");
-    //}
+    const owner = await this.userRepository.findById(ownerId);
+    if (!owner) {
+      throw new Error("Owner not found");
+    }
 
     // Check if the owner has enough quota for this server
-    //if (memoryLimit.valueMb > owner.getQuota().getValue()) {
-    //throw new Error("Owner does not have enough quota for this server");
-    //}
+    if (memoryLimit.valueMb > owner.getQuota().getValue()) {
+      throw new Error("Owner does not have enough quota for this server");
+    }
 
     // Check if the node exists and has enough resources to allocate this server
     const nodeId = IdFactory.load<NodeId>(req.nodeId);

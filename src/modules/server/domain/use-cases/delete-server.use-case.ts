@@ -1,20 +1,30 @@
-import { ServerRepository } from "../../domain/repositories/server.repository.js";
 import { IdFactory, ServerId, UserId } from "../value-objects/id.vo.js";
 import { DeleteServerDto } from "../dtos/delete-server.dto.js";
-import { NodeRepository } from "../../domain/repositories/node.repository.js";
-import { UserRepository } from "../../domain/repositories/user.repository.js";
-import { ContainerProvider } from "../../domain/ports/container.provider.js";
+import { Injectable, Inject } from "@nestjs/common";
+import { SERVER_REPOSITORY } from "../../domain/repositories/server.repository.js";
+import type { ServerRepository } from "../../domain/repositories/server.repository.js";
+import { NODE_REPOSITORY } from "../../domain/repositories/node.repository.js";
+import type { NodeRepository } from "../../domain/repositories/node.repository.js";
+import { USER_REPOSITORY } from "../../domain/repositories/user.repository.js";
+import type { UserRepository } from "../../domain/repositories/user.repository.js";
+import { CONTAINER_PROVIDER } from "../../domain/ports/container.provider.js";
+import type { ContainerProvider } from "../../domain/ports/container.provider.js";
 
+@Injectable()
 export class DeleteServerUseCase {
   constructor(
+    @Inject(SERVER_REPOSITORY)
     private serverRepository: ServerRepository,
+    @Inject(NODE_REPOSITORY)
     private nodeRepository: NodeRepository,
+    @Inject(CONTAINER_PROVIDER)
     private containerProvider: ContainerProvider,
+    @Inject(USER_REPOSITORY)
     private userRepository: UserRepository
   ) {}
 
   async execute(dto: DeleteServerDto): Promise<void> {
-    const serverId = IdFactory.load<ServerId>(dto.id);
+    const serverId = IdFactory.load<ServerId>(dto.serverId);
     const server = await this.serverRepository.findById(serverId);
     if (!server) {
       throw new Error(`Server with ID ${serverId} not found`);
